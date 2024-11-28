@@ -6,7 +6,7 @@ import numpy.typing as npt
 from pose.keypoints import CocoPoseKeypoints
 
 
-class Player:
+class Person:
     def __init__(self) -> None:
         self.spine_angle = 0.0
 
