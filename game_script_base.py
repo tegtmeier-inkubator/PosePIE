@@ -12,6 +12,8 @@ class GameScriptBase(ABC):
     def __init__(self, max_num_players: int = 4):
         self.max_num_players = max_num_players
 
+        self.setup()
+
         self.pose = Pose(self.max_num_players)
         self.gamepad = [Gamepad() for _ in range(self.max_num_players)]
 
@@ -32,6 +34,10 @@ class GameScriptBase(ABC):
 
             for gamepad in self.gamepad:
                 gamepad.update()
+
+    @abstractmethod
+    def setup(self) -> None:
+        raise NotImplementedError
 
     @abstractmethod
     def update(self) -> None:

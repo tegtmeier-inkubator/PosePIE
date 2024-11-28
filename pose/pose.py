@@ -27,3 +27,5 @@ class Pose:
                     print(
                         f"Player {person_id+1}: {person.steering_angle} {person.spine_angle} {person.hand_center_diff} {person.hand_right_diff}"
                     )
+                else:
+                    print(f"Player {person_id+1}: Not visible")
