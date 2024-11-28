@@ -8,23 +8,22 @@ from pose.keypoints import CocoPoseKeypoints
 
 class Player:
     def __init__(self) -> None:
-        self.reset()
-
-        self._hand_right_old: npt.NDArray | None = None
-        self._hand_center_old: npt.NDArray | None = None
-
-    def reset(self) -> None:
         self.spine_angle = 0.0
+
         self.hand_center_diff = np.array([0.0, 0.0])
         self.steering_angle = 0.0
+        self.accelerate = False
+
         self.hand_right_diff = np.array([0.0, 0.0])
         self.swipe_left = False
         self.swipe_right = False
         self.swipe_up = False
         self.swipe_down = False
-        self.accelerate = False
 
-    def parse_keypoints(self, keypoints: npt.NDArray, keypoints_scores: npt.NDArray) -> None:
+        self._hand_right_old: npt.NDArray | None = None
+        self._hand_center_old: npt.NDArray | None = None
+
+    def _parse_spine_angle(self, keypoints: npt.NDArray, keypoints_scores: npt.NDArray) -> None:
         if (
             keypoints_scores[CocoPoseKeypoints.LEFT_SHOULDER.value] > 0.8
             and keypoints_scores[CocoPoseKeypoints.RIGHT_SHOULDER.value] > 0.8
@@ -38,6 +37,7 @@ class Player:
         else:
             self.spine_angle = 0.0
 
+    def _parse_steering(self, keypoints: npt.NDArray, keypoints_scores: npt.NDArray) -> None:
         if keypoints_scores[CocoPoseKeypoints.LEFT_WRIST.value] > 0.8 and keypoints_scores[CocoPoseKeypoints.RIGHT_WRIST.value] > 0.8:
             hand_center = (keypoints[CocoPoseKeypoints.LEFT_WRIST.value] + keypoints[CocoPoseKeypoints.RIGHT_WRIST.value]) / 2
 
@@ -56,6 +56,7 @@ class Player:
             self.steering_angle = 0.0
             self.accelerate = False
 
+    def _parse_hand_swiping(self, keypoints: npt.NDArray, keypoints_scores: npt.NDArray) -> None:
         if keypoints_scores[CocoPoseKeypoints.RIGHT_WRIST.value] > 0.8:
             if self._hand_right_old is not None:
                 alpha = 0.3
@@ -89,3 +90,8 @@ class Player:
             self.swipe_down = True
         elif self.hand_right_diff[1] < swipe_threshold_out / 2:
             self.swipe_down = False
+
+    def parse_keypoints(self, keypoints: npt.NDArray, keypoints_scores: npt.NDArray) -> None:
+        self._parse_spine_angle(keypoints, keypoints_scores)
+        self._parse_steering(keypoints, keypoints_scores)
+        self._parse_hand_swiping(keypoints, keypoints_scores)

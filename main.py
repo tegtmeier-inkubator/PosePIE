@@ -32,8 +32,6 @@ for result in results:
         idxs = np.argsort(positions_x)[::-1]
 
         for player_id, pose_player in enumerate(pose_players):
-            pose_player.reset()
-
             if player_id < len(idxs):
                 pose_player.parse_keypoints(keypoints[idxs[player_id]], keypoints_scores[idxs[player_id]])
 
