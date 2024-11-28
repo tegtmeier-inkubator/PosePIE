@@ -4,10 +4,8 @@ import numpy as np
 from ultralytics import YOLO
 import vgamepad as vg
 
-from pose.keypoints import CocoPoseKeypoints
+from pose.player import Player
 
-
-gamepad = vg.VX360Gamepad()
 
 MODEL = "yolov8l-pose"
 
@@ -16,40 +14,40 @@ if not os.path.exists(f"{MODEL}.engine"):
     model.export(format="engine", simplify=True, half=True, batch=1)
 
 model = YOLO(f"{MODEL}.engine")
-results = model(source=3, show=False, save=False, conf=0.5, stream=True)
+results = model(source=3, show=True, save=False, conf=0.8, stream=True)
+
+gamepads = [vg.VX360Gamepad() for _ in range(4)]
+pose_players = [Player() for _ in range(4)]
 
 for result in results:
-    gamepad.reset()
+    for gamepad in gamepads:
+        gamepad.reset()
 
-    if result.keypoints.conf is not None:
-        keypoints = result.keypoints.xy[0].cpu()
-        conf = result.keypoints.conf[0].cpu()
+    if result.boxes.conf is not None and result.keypoints.conf is not None:
+        bboxes = result.boxes.xyxy.cpu().numpy()
+        keypoints = result.keypoints.xy.cpu().numpy()
+        keypoints_scores = result.keypoints.conf.cpu().numpy()
 
-        # spine_upper = np.mean([keypoints[CocoPoseKeypoints.LEFT_SHOULDER.value], keypoints[CocoPoseKeypoints.RIGHT_SHOULDER.value]], 0)
-        # spine_lower = np.mean([keypoints[CocoPoseKeypoints.LEFT_HIP.value], keypoints[CocoPoseKeypoints.RIGHT_HIP.value]], 0)
-        # spine = spine_upper - spine_lower
+        positions_x = [bbox[0] for bbox in bboxes]
+        idxs = np.argsort(positions_x)[::-1]
 
-        # print(np.rad2deg(np.arctan2(spine[0], -spine[1])))
+        for player_id, pose_player in enumerate(pose_players):
+            pose_player.reset()
 
-        if (
-            np.min(
-                [
-                    conf[CocoPoseKeypoints.LEFT_WRIST.value],
-                    conf[CocoPoseKeypoints.RIGHT_WRIST.value],
-                ]
-            )
-            > 0.8
-        ):
-            left_wrist = keypoints[CocoPoseKeypoints.LEFT_WRIST.value]
-            right_wrist = keypoints[CocoPoseKeypoints.RIGHT_WRIST.value]
-            vector = left_wrist - right_wrist
-            angle = float(-np.rad2deg(np.arctan2(vector[1], vector[0])))
+            if player_id < len(idxs):
+                pose_player.parse_keypoints(keypoints[idxs[player_id]], keypoints_scores[idxs[player_id]])
 
-            print(angle)
+                gamepads[player_id].left_joystick_float(
+                    x_value_float=np.clip(pose_player.steering_angle / 90, -1, 1),
+                    y_value_float=0,
+                )
 
-            gamepad.left_joystick_float(
-                x_value_float=np.clip(angle / 90, -1, 1), y_value_float=0
-            )
-            gamepad.press_button(button=vg.XUSB_BUTTON.XUSB_GAMEPAD_A)
+                if pose_player.accelerate:
+                    gamepads[player_id].press_button(button=vg.XUSB_BUTTON.XUSB_GAMEPAD_A)
 
-    gamepad.update()
+                print(
+                    f"Player {player_id+1}: {pose_player.steering_angle} {pose_player.spine_angle} {pose_player.hand_center_diff} {pose_player.hand_right_diff}"
+                )
+
+    for gamepad in gamepads:
+        gamepad.update()

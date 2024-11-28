@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class CocoPoseKeypoints(Enum):
     NOSE = 0
     LEFT_EYE = 1
