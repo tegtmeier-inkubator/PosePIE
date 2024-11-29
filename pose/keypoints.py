@@ -1,21 +1,95 @@
-from enum import IntEnum
+import numpy as np
+
+import numpy.typing as npt
 
 
-class CocoPoseKeypoints(IntEnum):
-    NOSE = 0
-    LEFT_EYE = 1
-    RIGHT_EYE = 2
-    LEFT_EAR = 3
-    RIGHT_EAR = 4
-    LEFT_SHOULDER = 5
-    RIGHT_SHOULDER = 6
-    LEFT_ELBOW = 7
-    RIGHT_ELBOW = 8
-    LEFT_WRIST = 9
-    RIGHT_WRIST = 10
-    LEFT_HIP = 11
-    RIGHT_HIP = 12
-    LEFT_KNEE = 13
-    RIGHT_KNEE = 14
-    LEFT_ANKLE = 15
-    RIGHT_ANKLE = 16
+class Keypoint:
+    def __init__(self, xy: npt.NDArray, conf: npt.NDArray) -> None:
+        assert xy.shape == (2,)
+        assert conf.shape == ()
+
+        self.xy = xy
+        self.x = xy[0]
+        self.y = xy[1]
+        self.conf = conf
+
+    def __repr__(self) -> str:
+        return f"(x={self.x}, y={self.y}, conf={self.conf})"
+
+
+class Keypoints:
+    def __init__(
+        self,
+        xy: npt.NDArray = np.empty((17, 2)),
+        conf: npt.NDArray = np.empty((17)),
+    ) -> None:
+        self.xy = xy
+        self.conf = conf
+
+    @property
+    def nose(self) -> Keypoint:
+        return Keypoint(self.xy[0], self.conf[0])
+
+    @property
+    def left_eye(self) -> Keypoint:
+        return Keypoint(self.xy[1], self.conf[1])
+
+    @property
+    def right_eye(self) -> Keypoint:
+        return Keypoint(self.xy[2], self.conf[2])
+
+    @property
+    def left_ear(self) -> Keypoint:
+        return Keypoint(self.xy[3], self.conf[3])
+
+    @property
+    def right_ear(self) -> Keypoint:
+        return Keypoint(self.xy[4], self.conf[4])
+
+    @property
+    def left_shoulder(self) -> Keypoint:
+        return Keypoint(self.xy[5], self.conf[5])
+
+    @property
+    def right_shoulder(self) -> Keypoint:
+        return Keypoint(self.xy[6], self.conf[6])
+
+    @property
+    def left_elbow(self) -> Keypoint:
+        return Keypoint(self.xy[7], self.conf[7])
+
+    @property
+    def right_elbow(self) -> Keypoint:
+        return Keypoint(self.xy[8], self.conf[8])
+
+    @property
+    def left_wrist(self) -> Keypoint:
+        return Keypoint(self.xy[9], self.conf[9])
+
+    @property
+    def right_wrist(self) -> Keypoint:
+        return Keypoint(self.xy[10], self.conf[10])
+
+    @property
+    def left_hip(self) -> Keypoint:
+        return Keypoint(self.xy[11], self.conf[11])
+
+    @property
+    def right_hip(self) -> Keypoint:
+        return Keypoint(self.xy[12], self.conf[12])
+
+    @property
+    def left_knee(self) -> Keypoint:
+        return Keypoint(self.xy[13], self.conf[13])
+
+    @property
+    def right_knee(self) -> Keypoint:
+        return Keypoint(self.xy[14], self.conf[14])
+
+    @property
+    def left_ankle(self) -> Keypoint:
+        return Keypoint(self.xy[15], self.conf[15])
+
+    @property
+    def right_ankle(self) -> Keypoint:
+        return Keypoint(self.xy[16], self.conf[16])
