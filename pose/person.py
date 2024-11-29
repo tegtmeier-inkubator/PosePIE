@@ -8,6 +8,8 @@ from pose.keypoints import CocoPoseKeypoints
 
 class Person:
     def __init__(self) -> None:
+        self.keypoints = np.empty((17, 2))
+
         self.spine_angle = 0.0
 
         self.hand_center_diff = np.array([0.0, 0.0])
@@ -92,6 +94,8 @@ class Person:
             self.swipe_down = False
 
     def parse_keypoints(self, keypoints: npt.NDArray, keypoints_scores: npt.NDArray) -> None:
+        self.keypoints = keypoints
+
         self._parse_spine_angle(keypoints, keypoints_scores)
         self._parse_steering(keypoints, keypoints_scores)
         self._parse_hand_swiping(keypoints, keypoints_scores)
