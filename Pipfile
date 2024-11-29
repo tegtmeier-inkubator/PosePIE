@@ -9,6 +9,7 @@ ultralytics = "*"
 vgamepad = "*"
 pydantic = "*"
 pydantic-settings = "*"
+python-uinput = "*"
 
 [dev-packages]
 
