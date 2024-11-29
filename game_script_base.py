@@ -8,10 +8,12 @@ from ultralytics import YOLO
 from input_emulation.gamepad import Gamepad
 from pose.pose import Pose
 
-WINDOW_TITLE = "Camera"
-
 CAMERA_DEVICE = 3
 DISPLAY_CAMERA = True
+WINDOW_TITLE = "Camera"
+
+POSE_MODEL = "yolov8l-pose"
+MIN_BBOX_CONF = 0.8
 
 
 class GameScriptBase(ABC):
@@ -24,13 +26,11 @@ class GameScriptBase(ABC):
         self.gamepad = [Gamepad() for _ in range(self.max_num_players)]
 
     def run(self) -> None:
-        MODEL = "yolov8l-pose"
+        if not os.path.exists(f"{POSE_MODEL}.engine"):
+            pose_model = YOLO(f"{POSE_MODEL}.pt")
+            pose_model.export(format="engine", simplify=True, half=True, batch=1)
 
-        if not os.path.exists(f"{MODEL}.engine"):
-            model = YOLO(f"{MODEL}.pt")
-            model.export(format="engine", simplify=True, half=True, batch=1)
-
-        model = YOLO(f"{MODEL}.engine")
+        pose_model = YOLO(f"{POSE_MODEL}.engine")
         cap = cv2.VideoCapture(CAMERA_DEVICE)
 
         try:
@@ -39,7 +39,7 @@ class GameScriptBase(ABC):
                 if not success:
                     break
 
-                results = model(frame, conf=0.8)
+                results = pose_model(frame, conf=MIN_BBOX_CONF)
 
                 self.pose.parse(results[0])
 
