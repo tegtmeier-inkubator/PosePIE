@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import IntEnum
 
 
-class CocoPoseKeypoints(Enum):
+class CocoPoseKeypoints(IntEnum):
     NOSE = 0
     LEFT_EYE = 1
     RIGHT_EYE = 2
