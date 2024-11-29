@@ -1,0 +1,61 @@
+import os
+from pathlib import Path
+
+from typing import Any
+
+import numpy as np
+from pydantic import BaseModel
+from ultralytics import YOLO
+
+from cv2.typing import MatLike
+
+from pose.person import Person
+
+
+class PoseModelConfig(BaseModel):
+    pose_model_path: str = "models/pose"
+    pose_model: str = "yolov8l-pose"
+    min_bbox_conf: float = 0.8
+
+
+class PoseModel:
+    def __init__(
+        self,
+        config: PoseModelConfig,
+        max_num_persons: int = 4,
+    ) -> None:
+        self._config = config
+        assert max_num_persons >= 1
+
+        if not os.path.exists(Path(self._config.pose_model_path) / f"{self._config.pose_model}.engine"):
+            model_tmp = YOLO(Path(self._config.pose_model_path) / f"{self._config.pose_model}.pt")
+            model_tmp.export(format="engine", simplify=True, half=True, batch=1)
+
+        self._model = YOLO(Path(self._config.pose_model_path) / f"{self._config.pose_model}.engine")
+
+        self.person = [Person() for _ in range(max_num_persons)]
+
+    def process_frame(self, frame: MatLike) -> Any:
+        results = self._model(frame, conf=self._config.min_bbox_conf)
+        self._parse_results(results[0])
+
+        return results[0]
+
+    def _parse_results(self, result: Any) -> None:
+        if result.boxes.conf is not None and result.keypoints.conf is not None:
+            bboxes = result.boxes.xyxyn.cpu().numpy()
+            keypoints = result.keypoints.xyn.cpu().numpy()
+            keypoints_scores = result.keypoints.conf.cpu().numpy()
+
+            positions_x = [bbox[0] for bbox in bboxes]
+            idxs = np.argsort(positions_x)[::-1]
+
+            for person_id, person in enumerate(self.person):
+                if person_id < len(idxs):
+                    person.parse_keypoints(keypoints[idxs[person_id]], keypoints_scores[idxs[person_id]])
+
+                    print(
+                        f"Player {person_id+1}: {person.steering_angle} {person.spine_angle} {person.hand_center_diff} {person.hand_right_diff}"
+                    )
+                else:
+                    print(f"Player {person_id+1}: Not visible")
