@@ -1,23 +1,23 @@
 import sys
 from pathlib import Path
 
-from script.loader import load
+from script.loader import load_script
 
 
 def main():
     try:
-        game_script_path = Path(sys.argv[1])
+        script_path = Path(sys.argv[1])
     except IndexError:
-        print("Please provide a game script as command-line argument!")
+        print("Please provide a script as command-line argument!")
         sys.exit(1)
 
-    game_script_class = load(game_script_path)
-    if game_script_class is None:
-        print("Cannot load game script!")
+    script_class = load_script(script_path)
+    if script_class is None:
+        print("Cannot load script!")
         sys.exit(1)
 
-    game_script = game_script_class()
-    game_script.run()
+    script = script_class()
+    script.run()
 
 
 if __name__ == "__main__":

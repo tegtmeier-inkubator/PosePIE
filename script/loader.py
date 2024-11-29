@@ -3,10 +3,10 @@ import inspect
 import sys
 from pathlib import Path
 
-from game_script_base import GameScriptBase
+from script.base import ScriptBase
 
 
-def load(file_path_py: Path) -> type[GameScriptBase] | None:
+def load_script(file_path_py: Path) -> type[ScriptBase] | None:
     module_name = file_path_py.stem
 
     spec = importlib.util.spec_from_file_location(module_name, file_path_py)
@@ -17,15 +17,15 @@ def load(file_path_py: Path) -> type[GameScriptBase] | None:
     sys.modules[module_name] = module
     spec.loader.exec_module(module)
 
-    game_script_class: type[GameScriptBase] | None = None
+    script_class: type[ScriptBase] | None = None
     for _, obj in inspect.getmembers(module, inspect.isclass):
         if module.__name__ != obj.__module__:
             continue
 
-        if not issubclass(obj, GameScriptBase):
+        if not issubclass(obj, ScriptBase):
             continue
 
-        game_script_class = obj
+        script_class = obj
         break
 
-    return game_script_class
+    return script_class

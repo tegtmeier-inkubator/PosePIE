@@ -1,9 +1,9 @@
 import numpy as np
 
-from game_script_base import GameScriptBase
+from script.base import ScriptBase
 
 
-class Trackmania(GameScriptBase):
+class Trackmania(ScriptBase):
     def setup(self) -> None:
         self.max_num_players = 1
 

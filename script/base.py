@@ -18,7 +18,7 @@ POSE_MODEL = "yolov8l-pose"
 MIN_BBOX_CONF = 0.8
 
 
-class GameScriptBase(ABC):
+class ScriptBase(ABC):
     def __init__(self, max_num_players: int = 4):
         self.max_num_players = max_num_players
 
