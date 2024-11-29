@@ -1,4 +1,4 @@
-from game_scripts.trackmania import TrackMania
+from game_scripts.trackmania import Trackmania
 
-game_script = TrackMania()
+game_script = Trackmania()
 game_script.run()
