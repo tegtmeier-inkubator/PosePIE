@@ -1,6 +1,7 @@
 import os
 
 from abc import ABC, abstractmethod
+from pathlib import Path
 
 import cv2
 from ultralytics import YOLO
@@ -12,6 +13,7 @@ CAMERA_DEVICE = 3
 DISPLAY_CAMERA = True
 WINDOW_TITLE = "Camera"
 
+POSE_MODELS_PATH = Path("models/pose")
 POSE_MODEL = "yolov8l-pose"
 MIN_BBOX_CONF = 0.8
 
@@ -26,11 +28,11 @@ class GameScriptBase(ABC):
         self.gamepad = [Gamepad() for _ in range(self.max_num_players)]
 
     def run(self) -> None:
-        if not os.path.exists(f"{POSE_MODEL}.engine"):
-            pose_model = YOLO(f"{POSE_MODEL}.pt")
+        if not os.path.exists(POSE_MODELS_PATH / f"{POSE_MODEL}.engine"):
+            pose_model = YOLO(POSE_MODELS_PATH / f"{POSE_MODEL}.pt")
             pose_model.export(format="engine", simplify=True, half=True, batch=1)
 
-        pose_model = YOLO(f"{POSE_MODEL}.engine")
+        pose_model = YOLO(POSE_MODELS_PATH / f"{POSE_MODEL}.engine")
         cap = cv2.VideoCapture(CAMERA_DEVICE)
 
         try:
