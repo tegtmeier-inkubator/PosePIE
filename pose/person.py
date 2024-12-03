@@ -66,34 +66,28 @@ class Person:
     def _parse_hand_swiping(self, keypoints: Keypoints) -> None:
         if keypoints.right_wrist.conf > 0.8:
             if self._hand_right_old is not None:
-                alpha = 0.3
+                alpha = 1.0
                 self._hand_right_diff = (1 - alpha) * self._hand_right_diff + alpha * (keypoints.right_wrist.xy - self._hand_right_old)
             self._hand_right_old = keypoints.right_wrist.xy
         else:
             self._hand_right_old = None
             self._hand_right_diff = np.array([0.0, 0.0])
 
-        swipe_threshold_in = 8
-        swipe_threshold_out = 1
+        swipe_threshold_in = 0.05
+        swipe_threshold_out = swipe_threshold_in / 4
 
-        if self._hand_right_diff[0] > swipe_threshold_in:
-            self.swipe_left = True
-        elif self._hand_right_diff[0] < swipe_threshold_out / 2:
+        norm = np.linalg.norm(self.hand_right_diff.xy)
+        angle = np.degrees(np.arctan2(-self.hand_right_diff.y, -self.hand_right_diff.x))
+
+        if norm > swipe_threshold_in:
+            self.swipe_left = angle < -135 or angle > 135
+            self.swipe_right = -45 < angle < 45
+            self.swipe_up = 45 < angle < 135
+            self.swipe_down = -135 < angle < -45
+        elif norm < swipe_threshold_out:
             self.swipe_left = False
-
-        if self._hand_right_diff[0] < -swipe_threshold_in:
-            self.swipe_right = True
-        elif self._hand_right_diff[0] > -swipe_threshold_out / 2:
             self.swipe_right = False
-
-        if self._hand_right_diff[1] < -swipe_threshold_in:
-            self.swipe_up = True
-        elif self._hand_right_diff[1] > -swipe_threshold_out / 2:
             self.swipe_up = False
-
-        if self._hand_right_diff[1] > swipe_threshold_in:
-            self.swipe_down = True
-        elif self._hand_right_diff[1] < swipe_threshold_out / 2:
             self.swipe_down = False
 
     @property

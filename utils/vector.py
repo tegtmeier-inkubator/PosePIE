@@ -5,6 +5,7 @@ class Vector2:
     def __init__(self, ndarray: npt.NDArray) -> None:
         assert ndarray.shape == (2,)
 
+        self.xy = ndarray
         self.x = ndarray[0]
         self.y = ndarray[1]
 
