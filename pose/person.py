@@ -13,18 +13,20 @@ class Person:
 
         self.spine_angle = 0.0
 
+        self._hand_center_old: npt.NDArray | None = None
         self._hand_center_diff = np.array([0.0, 0.0])
         self.steering_angle = 0.0
         self.accelerate = False
 
+        self._hip_center_old: npt.NDArray | None = None
+        self._hip_center_diff = np.array([0.0, 0.0])
+
+        self._hand_right_old: npt.NDArray | None = None
         self._hand_right_diff = np.array([0.0, 0.0])
         self.swipe_left = False
         self.swipe_right = False
         self.swipe_up = False
         self.swipe_down = False
-
-        self._hand_right_old: npt.NDArray | None = None
-        self._hand_center_old: npt.NDArray | None = None
 
     def _parse_spine_angle(self, keypoints: Keypoints) -> None:
         if (
@@ -63,6 +65,26 @@ class Person:
     def hand_center_diff(self) -> Vector2:
         return Vector2(self._hand_center_diff)
 
+    def _parse_jumping(self, keypoints: Keypoints) -> None:
+        if keypoints.left_hip.conf > 0.8 and keypoints.right_hip.conf > 0.8:
+            hip_center = (keypoints.left_hip.xy + keypoints.right_hip.xy) / 2
+
+            if self._hip_center_old is not None:
+                alpha = 0.5
+                self._hip_center_diff = (1 - alpha) * self._hip_center_diff + alpha * (hip_center - self._hip_center_old)
+            self._hip_center_old = hip_center
+        else:
+            self._hand_center_old = None
+            self._hand_center_diff = np.array([0.0, 0.0])
+
+    @property
+    def hip_center_diff(self) -> Vector2:
+        return Vector2(self._hip_center_diff)
+
+    @property
+    def jumping(self) -> bool:
+        return self.hip_center_diff.y < -0.01
+
     def _parse_hand_swiping(self, keypoints: Keypoints) -> None:
         if keypoints.right_wrist.conf > 0.8:
             if self._hand_right_old is not None:
@@ -99,4 +121,5 @@ class Person:
 
         self._parse_spine_angle(self.keypoints)
         self._parse_steering(self.keypoints)
+        self._parse_jumping(self.keypoints)
         self._parse_hand_swiping(self.keypoints)
