@@ -13,4 +13,4 @@ class Trackmania(ScriptBase):
             self.gamepad[player_id].stick_left.y = 0.0
 
             self.gamepad[player_id].button_a = self.pose.person[player_id].accelerate
-            self.gamepad[player_id].button_rb = self.pose.person[player_id].hand_center_diff.y < -10
+            self.gamepad[player_id].button_rb = self.pose.person[player_id].hand_center_diff.y < -0.05
