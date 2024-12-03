@@ -37,15 +37,26 @@ class PoseModel:
 
     def process_frame(self, frame: MatLike) -> Any:
         results = self._model(frame, conf=self._config.min_bbox_conf)
-        self._parse_results(results[0])
+        self._parse_results(results[0], frame.shape)
 
         return results[0]
 
-    def _parse_results(self, result: Any) -> None:
+    def _parse_results(self, result: Any, frame_shape: tuple[int, int]) -> None:
         if result.boxes.conf is not None and result.keypoints.conf is not None:
             bboxes = result.boxes.xyxyn.cpu().numpy()
             keypoints = result.keypoints.xyn.cpu().numpy()
             keypoints_scores = result.keypoints.conf.cpu().numpy()
+
+            if frame_shape[1] > frame_shape[0]:
+                aspect_ratio = frame_shape[0] / frame_shape[1]
+                bboxes[:, 1] *= aspect_ratio
+                bboxes[:, 3] *= aspect_ratio
+                keypoints[:, :, 1] *= aspect_ratio
+            else:
+                aspect_ratio = frame_shape[1] / frame_shape[0]
+                bboxes[:, 0] *= aspect_ratio
+                bboxes[:, 2] *= aspect_ratio
+                keypoints[:, :, 0] *= aspect_ratio
 
             positions_x = [bbox[0] for bbox in bboxes]
             idxs = np.argsort(positions_x)[::-1]
