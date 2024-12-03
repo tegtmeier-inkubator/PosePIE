@@ -13,8 +13,8 @@ from pose.person import Person
 
 
 class PoseModelConfig(BaseModel):
-    pose_model_path: str = "models/pose"
-    pose_model: str = "yolov8l-pose"
+    model: str = "yolov8l-pose"
+    model_path: str = "models/pose"
     min_bbox_conf: float = 0.8
 
 
@@ -27,11 +27,11 @@ class PoseModel:
         self._config = config
         assert max_num_persons >= 1
 
-        if not os.path.exists(Path(self._config.pose_model_path) / f"{self._config.pose_model}.engine"):
-            model_tmp = YOLO(Path(self._config.pose_model_path) / f"{self._config.pose_model}.pt")
+        if not os.path.exists(Path(self._config.model_path) / f"{self._config.model}.engine"):
+            model_tmp = YOLO(Path(self._config.model_path) / f"{self._config.model}.pt")
             model_tmp.export(format="engine", simplify=True, half=True, batch=1)
 
-        self._model = YOLO(Path(self._config.pose_model_path) / f"{self._config.pose_model}.engine")
+        self._model = YOLO(Path(self._config.model_path) / f"{self._config.model}.engine")
 
         self.person = [Person() for _ in range(max_num_persons)]
 
