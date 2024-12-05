@@ -7,6 +7,8 @@ class Trackmania(ScriptBase):
     def setup(self) -> None:
         self.max_num_players = 1
 
+        self.gamepad = [self.add_gamepad() for _ in range(self.max_num_players)]
+
     def update(self) -> None:
         for player_id in range(self.max_num_players):
             self.gamepad[player_id].stick_left.x = np.clip(self.pose.person[player_id].steering_angle / 90, -1, 1)

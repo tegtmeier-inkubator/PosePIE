@@ -4,8 +4,10 @@ import cv2
 
 from config import Config
 from input_emulation.gamepad import Gamepad
+from input_emulation.gamepad_plugin import GamepadPlugin
 from pose.camera import Camera
 from pose.model import PoseModel
+from script.plugin import PluginBase
 
 CV2_WINDOW_TITLE = "Camera"
 
@@ -19,15 +21,24 @@ class ScriptBase(ABC):
         self._config = config
         self.max_num_players = max_num_players
 
+        self._plugins: list[PluginBase] = []
+
         self.setup()
 
         self.pose = PoseModel(self._config.pose, self.max_num_players)
-        self.gamepad = [Gamepad() for _ in range(self.max_num_players)]
+
+    def add_gamepad(self) -> Gamepad:
+        gamepad = Gamepad()
+        self._plugins.append(GamepadPlugin(gamepad))
+        return gamepad
 
     def run(self) -> None:
         camera = Camera(self._config.camera)
 
         try:
+            for plugin in self._plugins:
+                plugin.create()
+
             while camera.is_opened():
                 frame = camera.read()
                 if frame is None:
@@ -35,10 +46,13 @@ class ScriptBase(ABC):
 
                 pose_result = self.pose.process_frame(frame)
 
+                for plugin in self._plugins:
+                    plugin.pre_update()
+
                 self.update()
 
-                for gamepad in self.gamepad:
-                    gamepad.update()
+                for plugin in self._plugins:
+                    plugin.post_update()
 
                 if self._config.show_camera:
                     annotated_frame = pose_result.plot()
@@ -48,6 +62,9 @@ class ScriptBase(ABC):
                         break
         except KeyboardInterrupt:
             pass
+
+        for plugin in self._plugins:
+            plugin.destroy()
 
         camera.release()
         cv2.destroyAllWindows()
