@@ -5,6 +5,8 @@ import cv2
 from config import Config
 from input_emulation.gamepad import Gamepad
 from input_emulation.gamepad_plugin import GamepadPlugin
+from input_emulation.keyboard import Keyboard
+from input_emulation.keyboard_plugin import KeyboardPlugin
 from input_emulation.mouse import Mouse
 from input_emulation.mouse_plugin import MousePlugin
 from pose.camera import Camera
@@ -33,6 +35,11 @@ class ScriptBase(ABC):
         gamepad = Gamepad()
         self._plugins.append(GamepadPlugin(gamepad))
         return gamepad
+
+    def add_keyboard(self) -> Keyboard:
+        keyboard = Keyboard()
+        self._plugins.append(KeyboardPlugin(keyboard))
+        return keyboard
 
     def add_mouse(self) -> Mouse:
         mouse = Mouse()
