@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, CliPositionalArg, SettingsConfigDict
 
 from pose.camera import CameraConfig
 from pose.model import PoseModelConfig
@@ -11,3 +11,5 @@ class Config(BaseSettings, cli_parse_args=True):
     pose: PoseModelConfig = PoseModelConfig()
 
     show_camera: bool = True
+
+    script: CliPositionalArg[str]

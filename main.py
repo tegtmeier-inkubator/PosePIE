@@ -6,15 +6,9 @@ from script.loader import load_script
 
 
 def main():
-    try:
-        script_path = Path(sys.argv.pop())
-    except IndexError:
-        print("Please provide a script as last command-line argument!")
-        sys.exit(1)
-
     config = Config()
 
-    script_class = load_script(script_path)
+    script_class = load_script(Path(config.script))
     if script_class is None:
         print("Cannot load script!")
         sys.exit(1)
