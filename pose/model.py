@@ -49,14 +49,16 @@ class PoseModel:
 
             if frame_shape[1] > frame_shape[0]:
                 aspect_ratio = frame_shape[0] / frame_shape[1]
-                bboxes[:, 1] *= aspect_ratio
-                bboxes[:, 3] *= aspect_ratio
-                keypoints[:, :, 1] *= aspect_ratio
+                shift = (1 - aspect_ratio) / 2
+                bboxes[:, 1] = (bboxes[:, 1] * aspect_ratio) + shift
+                bboxes[:, 3] = (bboxes[:, 3] * aspect_ratio) + shift
+                keypoints[:, :, 1] = (keypoints[:, :, 1] * aspect_ratio) + shift
             else:
                 aspect_ratio = frame_shape[1] / frame_shape[0]
-                bboxes[:, 0] *= aspect_ratio
-                bboxes[:, 2] *= aspect_ratio
-                keypoints[:, :, 0] *= aspect_ratio
+                shift = (1 - aspect_ratio) / 2
+                bboxes[:, 0] = (bboxes[:, 0] * aspect_ratio) + shift
+                bboxes[:, 2] = (bboxes[:, 2] * aspect_ratio) + shift
+                keypoints[:, :, 0] = (keypoints[:, :, 0] * aspect_ratio) + shift
 
             positions_x = [bbox[0] for bbox in bboxes]
             idxs = np.argsort(positions_x)[::-1]
