@@ -1,5 +1,3 @@
-import uinput
-
 from script.base import ScriptBase
 
 
