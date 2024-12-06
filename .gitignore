@@ -1,3 +1,4 @@
 **/*.pyc
+.coverage
 .mypy_cache
 models
