@@ -48,3 +48,26 @@ class FallingEdge:
         falling = self._old_value and (not value)
         self._old_value = value
         return falling
+
+
+class Turbo:
+    def __init__(self, interval: float) -> None:
+        self._interval = interval
+
+        self._firing: bool = False
+        self._last_fired: float = -np.inf
+
+    def __call__(self, value: bool, timestamp: float | None = None) -> bool:
+        if timestamp is None:
+            timestamp = time.perf_counter()
+
+        if self._firing:
+            self._firing = False
+        else:
+            if value and timestamp - self._last_fired >= self._interval:
+                self._firing = True
+                self._last_fired = timestamp
+            elif not value:
+                self._last_fired = -np.inf
+
+        return self._firing

@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils.filter import Derivative, FallingEdge, RisingEdge
+from utils.filter import Derivative, FallingEdge, RisingEdge, Turbo
 
 
 class TestDerivative:
@@ -83,3 +83,35 @@ class TestFallingEdge:
         assert falling_edge(True) is False
         assert falling_edge(False) is True
         assert falling_edge(True) is False
+
+
+class TestTurbo:
+    def test_interval(self) -> None:
+        turbo = Turbo(1.0)
+
+        assert turbo(True, timestamp=0.0) is True
+        assert turbo(True, timestamp=0.0) is False
+        assert turbo(True, timestamp=0.9) is False
+        assert turbo(True, timestamp=1.0) is True
+
+        assert turbo(False, timestamp=2.0) is False
+        assert turbo(False, timestamp=2.5) is False
+
+        assert turbo(True, timestamp=3.0) is True
+        assert turbo(True, timestamp=3.0) is False
+        assert turbo(True, timestamp=3.9) is False
+        assert turbo(True, timestamp=4.0) is True
+
+    def test_negative_time(self) -> None:
+        turbo = Turbo(1.0)
+
+        assert turbo(True, timestamp=-1.0) is True
+        assert turbo(True, timestamp=-1.0) is False
+        assert turbo(True, timestamp=-1.9) is False
+        assert turbo(True, timestamp=-2.0) is False
+
+    def test_without_timestamp(self) -> None:
+        turbo = Turbo(1.0)
+
+        assert turbo(True) is True
+        assert turbo(True) is False
