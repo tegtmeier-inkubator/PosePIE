@@ -1,11 +1,15 @@
 import cv2
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from cv2.typing import MatLike
 
 
 class CameraConfig(BaseModel):
-    device: int = 0
+    device: int = Field(
+        0,
+        ge=0,
+        description="device ID of camera",
+    )
 
 
 class Camera:

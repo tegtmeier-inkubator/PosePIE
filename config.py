@@ -1,3 +1,4 @@
+from pydantic import Field
 from pydantic_settings import BaseSettings, CliPositionalArg, SettingsConfigDict
 
 from pose.camera import CameraConfig
@@ -10,6 +11,9 @@ class Config(BaseSettings, cli_parse_args=True):
     camera: CameraConfig = CameraConfig()
     pose: PoseModelConfig = PoseModelConfig()
 
-    show_camera: bool = True
+    show_camera: bool = Field(
+        True,
+        description="show window with annotated camera image",
+    )
 
     script: CliPositionalArg[str]

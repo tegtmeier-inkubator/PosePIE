@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from ultralytics import YOLO
 
 from cv2.typing import MatLike
@@ -13,9 +13,18 @@ from pose.person import Person
 
 
 class PoseModelConfig(BaseModel):
-    model: str = "yolov8l-pose"
-    model_path: str = "models/pose"
-    min_bbox_conf: float = 0.8
+    model: str = Field(
+        "yolov8l-pose",
+        description="name of Ultralytics pose model (e.g. yolov8l-pose, yolov8n-pose, yolo11l-pose)",
+    )
+    model_path: str = Field(
+        "models/pose",
+        description="path to models folder",
+    )
+    min_bbox_conf: float = Field(
+        0.8,
+        description="minimum required confidence for detecting a person",
+    )
 
 
 class PoseModel:
