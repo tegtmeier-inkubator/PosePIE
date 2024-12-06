@@ -31,7 +31,7 @@ class Derivative:
 
 
 class RisingEdge:
-    def __init__(self):
+    def __init__(self) -> None:
         self._old_value = True
 
     def __call__(self, value: bool) -> bool:
@@ -41,7 +41,7 @@ class RisingEdge:
 
 
 class FallingEdge:
-    def __init__(self):
+    def __init__(self) -> None:
         self._old_value = False
 
     def __call__(self, value: bool) -> bool:
