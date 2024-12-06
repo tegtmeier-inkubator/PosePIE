@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from typing import Any
+from typing import Any, Optional
 
 import numpy as np
 from pydantic import BaseModel, Field
@@ -25,6 +25,10 @@ class PoseModelConfig(BaseModel):
         default=False,
         description="use TensorRT for inference",
     )
+    device: Optional[str] = Field(
+        default=None,
+        description="device to use for inference (e.g. cpu, cuda, cuda:0)",
+    )
     min_bbox_conf: float = Field(
         default=0.8,
         description="minimum required confidence for detecting a person",
@@ -40,7 +44,7 @@ class PoseModel:
         self._config = config
         assert max_num_persons >= 1
 
-        if config.tensorrt:
+        if self._config.tensorrt:
             if not os.path.exists(Path(self._config.model_path) / f"{self._config.model}.engine"):
                 model_tmp = YOLO(Path(self._config.model_path) / f"{self._config.model}.pt")
                 model_tmp.export(format="engine", simplify=True, half=True, batch=1)
@@ -52,7 +56,7 @@ class PoseModel:
         self.person = [Person() for _ in range(max_num_persons)]
 
     def process_frame(self, frame: MatLike) -> Any:
-        results = self._model(frame, conf=self._config.min_bbox_conf)
+        results = self._model(frame, conf=self._config.min_bbox_conf, device=self._config.device)
         self._parse_results(results[0], frame.shape)
 
         return results[0]

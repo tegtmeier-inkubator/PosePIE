@@ -5,7 +5,7 @@ from pose.camera import CameraConfig
 from pose.model import PoseModelConfig
 
 
-class Config(BaseSettings, cli_parse_args=True):
+class Config(BaseSettings, cli_parse_args=True, cli_hide_none_type=True):
     model_config = SettingsConfigDict(env_nested_delimiter="__")
 
     camera: CameraConfig = CameraConfig()
