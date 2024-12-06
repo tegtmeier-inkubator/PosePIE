@@ -6,7 +6,7 @@ from cv2.typing import MatLike
 
 class CameraConfig(BaseModel):
     device: int = Field(
-        0,
+        default=0,
         ge=0,
         description="device ID of camera",
     )
