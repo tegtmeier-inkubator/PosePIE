@@ -21,6 +21,10 @@ class PoseModelConfig(BaseModel):
         "models/pose",
         description="path to models folder",
     )
+    tensorrt: bool = Field(
+        False,
+        description="use TensorRT for inference",
+    )
     min_bbox_conf: float = Field(
         0.8,
         description="minimum required confidence for detecting a person",
@@ -36,11 +40,14 @@ class PoseModel:
         self._config = config
         assert max_num_persons >= 1
 
-        if not os.path.exists(Path(self._config.model_path) / f"{self._config.model}.engine"):
-            model_tmp = YOLO(Path(self._config.model_path) / f"{self._config.model}.pt")
-            model_tmp.export(format="engine", simplify=True, half=True, batch=1)
+        if config.tensorrt:
+            if not os.path.exists(Path(self._config.model_path) / f"{self._config.model}.engine"):
+                model_tmp = YOLO(Path(self._config.model_path) / f"{self._config.model}.pt")
+                model_tmp.export(format="engine", simplify=True, half=True, batch=1)
 
-        self._model = YOLO(Path(self._config.model_path) / f"{self._config.model}.engine")
+            self._model = YOLO(Path(self._config.model_path) / f"{self._config.model}.engine")
+        else:
+            self._model = YOLO(Path(self._config.model_path) / f"{self._config.model}.pt")
 
         self.person = [Person() for _ in range(max_num_persons)]
 
