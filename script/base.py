@@ -41,8 +41,8 @@ class ScriptBase(ABC):
         self._plugins.append(KeyboardPlugin(keyboard))
         return keyboard
 
-    def add_mouse(self) -> Mouse:
-        mouse = Mouse()
+    def add_mouse(self, absolute: bool = False) -> Mouse:
+        mouse = Mouse(absolute)
         self._plugins.append(MousePlugin(mouse))
         return mouse
 
