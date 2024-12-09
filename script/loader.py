@@ -15,7 +15,11 @@ def load_script(file_path_py: Path) -> type[ScriptBase] | None:
 
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
-    spec.loader.exec_module(module)
+
+    try:
+        spec.loader.exec_module(module)
+    except FileNotFoundError:
+        return None
 
     script_class: type[ScriptBase] | None = None
     for _, obj in inspect.getmembers(module, inspect.isclass):
