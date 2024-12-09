@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from ultralytics import YOLO
 
 from cv2.typing import MatLike
+import numpy.typing as npt
 
 from pose.person import Person
 
@@ -33,6 +34,27 @@ class PoseModelConfig(BaseModel):
         default=0.8,
         description="minimum required confidence for detecting a person",
     )
+
+
+def correct_aspect_ratio(
+    frame_shape: tuple[int, int],
+    bboxes: npt.NDArray,
+    keypoints: npt.NDArray,
+) -> tuple[npt.NDArray, npt.NDArray]:
+    if frame_shape[1] > frame_shape[0]:
+        aspect_ratio = frame_shape[0] / frame_shape[1]
+        shift = (1 - aspect_ratio) / 2
+        bboxes[:, 1] = (bboxes[:, 1] * aspect_ratio) + shift
+        bboxes[:, 3] = (bboxes[:, 3] * aspect_ratio) + shift
+        keypoints[:, :, 1] = (keypoints[:, :, 1] * aspect_ratio) + shift
+    else:
+        aspect_ratio = frame_shape[1] / frame_shape[0]
+        shift = (1 - aspect_ratio) / 2
+        bboxes[:, 0] = (bboxes[:, 0] * aspect_ratio) + shift
+        bboxes[:, 2] = (bboxes[:, 2] * aspect_ratio) + shift
+        keypoints[:, :, 0] = (keypoints[:, :, 0] * aspect_ratio) + shift
+
+    return bboxes, keypoints
 
 
 class PoseModel:
@@ -72,18 +94,7 @@ class PoseModel:
             keypoints = result.keypoints.xyn.cpu().numpy()
             keypoints_scores = result.keypoints.conf.cpu().numpy()
 
-            if frame_shape[1] > frame_shape[0]:
-                aspect_ratio = frame_shape[0] / frame_shape[1]
-                shift = (1 - aspect_ratio) / 2
-                bboxes[:, 1] = (bboxes[:, 1] * aspect_ratio) + shift
-                bboxes[:, 3] = (bboxes[:, 3] * aspect_ratio) + shift
-                keypoints[:, :, 1] = (keypoints[:, :, 1] * aspect_ratio) + shift
-            else:
-                aspect_ratio = frame_shape[1] / frame_shape[0]
-                shift = (1 - aspect_ratio) / 2
-                bboxes[:, 0] = (bboxes[:, 0] * aspect_ratio) + shift
-                bboxes[:, 2] = (bboxes[:, 2] * aspect_ratio) + shift
-                keypoints[:, :, 0] = (keypoints[:, :, 0] * aspect_ratio) + shift
+            bboxes, keypoints = correct_aspect_ratio(frame_shape, bboxes, keypoints)
 
             positions_x = [bbox[0] for bbox in bboxes]
             idxs = np.argsort(positions_x)[::-1]
