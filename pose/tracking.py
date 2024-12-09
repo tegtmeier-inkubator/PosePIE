@@ -4,7 +4,7 @@ import numpy as np
 
 import numpy.typing as npt
 
-from pose.keypoints import Keypoints
+from pose.person import Person
 
 
 class Tracking:
@@ -43,13 +43,11 @@ class Tracking:
 
         for track_id in unassigned_track_ids.copy():
             idx = track_ids.index(track_id)
-            keypoints_person = Keypoints(keypoints[idx], keypoints_scores[idx])
 
-            if (
-                keypoints_person.right_elbow.conf > 0.8
-                and keypoints_person.right_eye.conf > 0.8
-                and keypoints_person.right_elbow.y < keypoints_person.right_eye.y
-            ):
+            person = Person()
+            person.parse_keypoints(keypoints[idx], keypoints_scores[idx])
+
+            if person.right_arm_raising.detected:
                 for person_id in range(self._max_num_persons):
                     if person_id not in self.person_to_track:
                         self.person_to_track[person_id] = track_id

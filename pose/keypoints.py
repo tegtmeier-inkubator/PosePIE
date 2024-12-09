@@ -13,7 +13,7 @@ class Keypoint:
         assert conf.shape == ()
 
         self.xy = xy
-        self.conf = conf
+        self._conf = conf
 
     @property
     def x(self) -> float:
@@ -22,6 +22,10 @@ class Keypoint:
     @property
     def y(self) -> float:
         return float(self.xy[1])
+
+    @property
+    def conf(self) -> float:
+        return float(self._conf)
 
     def __repr__(self) -> str:
         return f"(x={self.x}, y={self.y}, conf={self.conf})"

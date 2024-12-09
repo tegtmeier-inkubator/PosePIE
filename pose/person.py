@@ -1,125 +1,59 @@
-import math
 import numpy as np
 
 import numpy.typing as npt
 
+from pose.gesture.arm_raising import ArmRaising, ArmRaisingResult
+from pose.gesture.jumping import Jumping, JumpingResult
+from pose.gesture.leaning import Leaning, LeaningResult
+from pose.gesture.steering import Steering, SteeringResult
+from pose.gesture.swiping import Swiping, SwipingResult
 from pose.keypoints import Keypoints
-from utils.vector import Vector2
+from utils.side import Side
 
 
 class Person:
     def __init__(self) -> None:
         self.keypoints = Keypoints()
 
-        self.spine_angle = 0.0
+        self._left_arm_raising = ArmRaising(Side.LEFT)
+        self._right_arm_raising = ArmRaising(Side.RIGHT)
+        self._jumping = Jumping()
+        self._leaning = Leaning()
+        self._steering = Steering()
+        self._left_hand_swiping = Swiping(Side.LEFT)
+        self._right_hand_swiping = Swiping(Side.RIGHT)
 
-        self._hand_center_old: npt.NDArray[np.float64] | None = None
-        self._hand_center_diff = np.array([0.0, 0.0])
-        self.steering_angle = 0.0
-        self.accelerate = False
-
-        self._hip_center_old: npt.NDArray[np.float64] | None = None
-        self._hip_center_diff = np.array([0.0, 0.0])
-
-        self._hand_right_old: npt.NDArray[np.float64] | None = None
-        self._hand_right_diff = np.array([0.0, 0.0])
-        self.swipe_left = False
-        self.swipe_right = False
-        self.swipe_up = False
-        self.swipe_down = False
-
-    def _parse_spine_angle(self, keypoints: Keypoints) -> None:
-        if (
-            keypoints.left_shoulder.conf > 0.8
-            and keypoints.right_shoulder.conf > 0.8
-            and keypoints.left_hip.conf > 0.8
-            and keypoints.right_hip.conf > 0.8
-        ):
-            shoulder_mid_xy = (keypoints.left_shoulder.xy + keypoints.right_shoulder.xy) / 2
-            hip_mid_xy = (keypoints.left_hip.xy + keypoints.right_hip.xy) / 2
-            spine_vector = Vector2(hip_mid_xy - shoulder_mid_xy)
-            self.spine_angle = np.degrees(np.arctan2(spine_vector.x, spine_vector.y))
-        else:
-            self.spine_angle = 0.0
-
-    def _parse_steering(self, keypoints: Keypoints) -> None:
-        if keypoints.left_wrist.conf > 0.8 and keypoints.right_wrist.conf > 0.8:
-            hand_center = (keypoints.left_wrist.xy + keypoints.right_wrist.xy) / 2
-
-            if self._hand_center_old is not None:
-                alpha = 0.5
-                self._hand_center_diff = (1 - alpha) * self._hand_center_diff + alpha * (hand_center - self._hand_center_old)
-            self._hand_center_old = hand_center
-
-            steering_vector = Vector2(keypoints.left_wrist.xy - keypoints.right_wrist.xy)
-            self.steering_angle = -math.degrees(math.atan2(steering_vector.y, steering_vector.x))
-            self.accelerate = True
-        else:
-            self._hand_center_old = None
-            self._hand_center_diff = np.array([0.0, 0.0])
-
-            self.steering_angle = 0.0
-            self.accelerate = False
-
-    @property
-    def hand_center_diff(self) -> Vector2:
-        return Vector2(self._hand_center_diff)
-
-    def _parse_jumping(self, keypoints: Keypoints) -> None:
-        if keypoints.left_hip.conf > 0.8 and keypoints.right_hip.conf > 0.8:
-            hip_center = (keypoints.left_hip.xy + keypoints.right_hip.xy) / 2
-
-            if self._hip_center_old is not None:
-                alpha = 0.5
-                self._hip_center_diff = (1 - alpha) * self._hip_center_diff + alpha * (hip_center - self._hip_center_old)
-            self._hip_center_old = hip_center
-        else:
-            self._hand_center_old = None
-            self._hand_center_diff = np.array([0.0, 0.0])
-
-    @property
-    def hip_center_diff(self) -> Vector2:
-        return Vector2(self._hip_center_diff)
-
-    @property
-    def jumping(self) -> bool:
-        return self.hip_center_diff.y < -0.01
-
-    def _parse_hand_swiping(self, keypoints: Keypoints) -> None:
-        if keypoints.right_wrist.conf > 0.8:
-            if self._hand_right_old is not None:
-                alpha = 1.0
-                self._hand_right_diff = (1 - alpha) * self._hand_right_diff + alpha * (keypoints.right_wrist.xy - self._hand_right_old)
-            self._hand_right_old = keypoints.right_wrist.xy
-        else:
-            self._hand_right_old = None
-            self._hand_right_diff = np.array([0.0, 0.0])
-
-        swipe_threshold_in = 0.05
-        swipe_threshold_out = swipe_threshold_in / 4
-
-        norm = np.linalg.norm(self.hand_right_diff.xy)
-        angle = np.degrees(np.arctan2(-self.hand_right_diff.y, -self.hand_right_diff.x))
-
-        if norm > swipe_threshold_in:
-            self.swipe_left = angle < -135 or angle > 135
-            self.swipe_right = -45 < angle < 45
-            self.swipe_up = 45 < angle < 135
-            self.swipe_down = -135 < angle < -45
-        elif norm < swipe_threshold_out:
-            self.swipe_left = False
-            self.swipe_right = False
-            self.swipe_up = False
-            self.swipe_down = False
-
-    @property
-    def hand_right_diff(self) -> Vector2:
-        return Vector2(self._hand_right_diff)
-
-    def parse_keypoints(self, keypoints: npt.NDArray[np.float64], keypoints_scores: npt.NDArray[np.float64]) -> None:
+    def parse_keypoints(
+        self,
+        keypoints: npt.NDArray[np.float64],
+        keypoints_scores: npt.NDArray[np.float64],
+    ) -> None:
         self.keypoints = Keypoints(keypoints, keypoints_scores)
 
-        self._parse_spine_angle(self.keypoints)
-        self._parse_steering(self.keypoints)
-        self._parse_jumping(self.keypoints)
-        self._parse_hand_swiping(self.keypoints)
+    @property
+    def left_arm_raising(self) -> ArmRaisingResult:
+        return self._left_arm_raising.parse_keypoints(self.keypoints)
+
+    @property
+    def right_arm_raising(self) -> ArmRaisingResult:
+        return self._right_arm_raising.parse_keypoints(self.keypoints)
+
+    @property
+    def jumping(self) -> JumpingResult:
+        return self._jumping.parse_keypoints(self.keypoints)
+
+    @property
+    def leaning(self) -> LeaningResult:
+        return self._leaning.parse_keypoints(self.keypoints)
+
+    @property
+    def steering(self) -> SteeringResult:
+        return self._steering.parse_keypoints(self.keypoints)
+
+    @property
+    def left_hand_swiping(self) -> SwipingResult:
+        return self._left_hand_swiping.parse_keypoints(self.keypoints)
+
+    @property
+    def right_hand_swiping(self) -> SwipingResult:
+        return self._right_hand_swiping.parse_keypoints(self.keypoints)
