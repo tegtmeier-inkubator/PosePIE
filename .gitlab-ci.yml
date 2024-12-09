@@ -1,0 +1,41 @@
+stages:
+  - test
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PIPENV_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pipenv"
+
+default:
+  tags: [docker]
+  image: python:3.12
+  cache:
+    paths:
+      - .cache/pip
+      - .cache/pipenv
+  before_script:
+    - apt-get update && apt-get install -y ffmpeg libsm6 libxext6 libevdev2
+    - pip install pipenv
+    - pipenv sync --dev
+
+black:
+  stage: test
+  script:
+    - pipenv run black --check --diff --color --line-length=140 .
+
+mypy:
+  stage: test
+  script:
+    - pipenv run mypy .
+
+pytest:
+  stage: test
+  script:
+    - pipenv run pytest --junitxml=report.xml --cov --cov-report term --cov-report xml:report_cov.xml
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: report_cov.xml
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+
