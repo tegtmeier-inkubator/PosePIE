@@ -21,7 +21,8 @@ class Derivative:
             self._diff = np.zeros_like(value)
 
         if self._old_value is not None and self._old_timestamp is not None:
-            diff = (value - self._old_value) / (timestamp - self._old_timestamp)
+            time_diff = timestamp - self._old_timestamp
+            diff = (value - self._old_value) / (timestamp - self._old_timestamp) if time_diff != 0.0 else np.inf
             self._diff = (1 - self._filter_coefficient) * self._diff + self._filter_coefficient * diff
 
         self._old_timestamp = timestamp
