@@ -1,6 +1,9 @@
 import time
 
+from typing import overload
+
 import numpy as np
+
 import numpy.typing as npt
 
 
@@ -8,21 +11,29 @@ class Derivative:
     def __init__(self, filter_coefficient: float = 1.0) -> None:
         self._filter_coefficient = filter_coefficient
 
-        self._diff = np.empty((0,))
+        self._diff: npt.NDArray[np.float64] | float | None = None
 
         self._old_timestamp: float | None = None
-        self._old_value: npt.NDArray | None = None
+        self._old_value: npt.NDArray[np.float64] | float | None = None
 
-    def __call__(self, value: npt.NDArray, timestamp: float | None = None) -> npt.NDArray:
+    @overload
+    def __call__(self, value: npt.NDArray[np.float64], timestamp: float | None = None) -> npt.NDArray[np.float64]: ...
+    @overload
+    def __call__(self, value: float, timestamp: float | None = None) -> float: ...
+    def __call__(self, value: npt.NDArray[np.float64] | float, timestamp: float | None = None) -> npt.NDArray[np.float64] | float:
         if timestamp is None:
             timestamp = time.perf_counter()
 
-        if self._diff.shape == (0,):
-            self._diff = np.zeros_like(value)
+        if self._diff is None:
+            self._diff = np.zeros_like(value) if isinstance(value, np.ndarray) else 0.0
 
         if self._old_value is not None and self._old_timestamp is not None:
             time_diff = timestamp - self._old_timestamp
-            diff = (value - self._old_value) / (timestamp - self._old_timestamp) if time_diff != 0.0 else np.inf
+            diff = (
+                (value - self._old_value) / (timestamp - self._old_timestamp)
+                if time_diff != 0.0
+                else np.full_like(value, np.inf) if isinstance(value, np.ndarray) else np.inf
+            )
             self._diff = (1 - self._filter_coefficient) * self._diff + self._filter_coefficient * diff
 
         self._old_timestamp = timestamp

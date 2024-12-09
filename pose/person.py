@@ -13,15 +13,15 @@ class Person:
 
         self.spine_angle = 0.0
 
-        self._hand_center_old: npt.NDArray | None = None
+        self._hand_center_old: npt.NDArray[np.float64] | None = None
         self._hand_center_diff = np.array([0.0, 0.0])
         self.steering_angle = 0.0
         self.accelerate = False
 
-        self._hip_center_old: npt.NDArray | None = None
+        self._hip_center_old: npt.NDArray[np.float64] | None = None
         self._hip_center_diff = np.array([0.0, 0.0])
 
-        self._hand_right_old: npt.NDArray | None = None
+        self._hand_right_old: npt.NDArray[np.float64] | None = None
         self._hand_right_diff = np.array([0.0, 0.0])
         self.swipe_left = False
         self.swipe_right = False
@@ -116,7 +116,7 @@ class Person:
     def hand_right_diff(self) -> Vector2:
         return Vector2(self._hand_right_diff)
 
-    def parse_keypoints(self, keypoints: npt.NDArray, keypoints_scores: npt.NDArray) -> None:
+    def parse_keypoints(self, keypoints: npt.NDArray[np.float64], keypoints_scores: npt.NDArray[np.float64]) -> None:
         self.keypoints = Keypoints(keypoints, keypoints_scores)
 
         self._parse_spine_angle(self.keypoints)

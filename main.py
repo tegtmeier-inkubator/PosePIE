@@ -5,7 +5,7 @@ from config import Config
 from script.loader import load_script
 
 
-def main():
+def main() -> None:
     config = Config()
 
     script_class = load_script(Path(config.script))

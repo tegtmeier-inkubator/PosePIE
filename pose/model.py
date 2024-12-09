@@ -38,9 +38,9 @@ class PoseModelConfig(BaseModel):
 
 def correct_aspect_ratio(
     frame_shape: tuple[int, int],
-    bboxes: npt.NDArray,
-    keypoints: npt.NDArray,
-) -> tuple[npt.NDArray, npt.NDArray]:
+    bboxes: npt.NDArray[np.float64],
+    keypoints: npt.NDArray[np.float64],
+) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     if frame_shape[1] > frame_shape[0]:
         aspect_ratio = frame_shape[0] / frame_shape[1]
         shift = (1 - aspect_ratio) / 2

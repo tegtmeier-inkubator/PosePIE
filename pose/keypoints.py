@@ -4,14 +4,24 @@ import numpy.typing as npt
 
 
 class Keypoint:
-    def __init__(self, xy: npt.NDArray, conf: npt.NDArray) -> None:
+    def __init__(
+        self,
+        xy: npt.NDArray[np.float64],
+        conf: npt.NDArray[np.float64],
+    ) -> None:
         assert xy.shape == (2,)
         assert conf.shape == ()
 
         self.xy = xy
-        self.x = xy[0]
-        self.y = xy[1]
         self.conf = conf
+
+    @property
+    def x(self) -> float:
+        return float(self.xy[0])
+
+    @property
+    def y(self) -> float:
+        return float(self.xy[1])
 
     def __repr__(self) -> str:
         return f"(x={self.x}, y={self.y}, conf={self.conf})"
@@ -20,8 +30,8 @@ class Keypoint:
 class Keypoints:
     def __init__(
         self,
-        xy: npt.NDArray = np.empty((17, 2)),
-        conf: npt.NDArray = np.empty((17,)),
+        xy: npt.NDArray[np.float64] = np.empty((17, 2)),
+        conf: npt.NDArray[np.float64] = np.empty((17,)),
     ) -> None:
         assert xy.shape == (17, 2)
         assert conf.shape == (17,)
