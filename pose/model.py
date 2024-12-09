@@ -121,14 +121,14 @@ class PoseModel:
             except KeyError:
                 print(f"Player {person_id+1}: not assigned")
                 person.parse_keypoints(np.zeros((17, 2)), np.zeros((17,)))
-                break
+                continue
 
             try:
                 idx = track_ids.index(track_id)
             except ValueError:
                 print(f"Player {person_id+1}: assigned to track {track_id} - not visible")
                 person.parse_keypoints(np.zeros((17, 2)), np.zeros((17,)))
-                break
+                continue
 
             print(f"Player {person_id+1}: assigned to track {track_id} - {bboxes[idx]}")
             person.parse_keypoints(keypoints[idx], keypoints_scores[idx])
