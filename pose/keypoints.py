@@ -21,8 +21,11 @@ class Keypoints:
     def __init__(
         self,
         xy: npt.NDArray = np.empty((17, 2)),
-        conf: npt.NDArray = np.empty((17)),
+        conf: npt.NDArray = np.empty((17,)),
     ) -> None:
+        assert xy.shape == (17, 2)
+        assert conf.shape == (17,)
+
         self.xy = xy
         self.conf = conf
 
