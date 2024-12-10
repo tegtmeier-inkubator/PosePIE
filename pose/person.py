@@ -6,6 +6,7 @@ import numpy.typing as npt
 from pose.gesture.arm_raising import ArmRaising, ArmRaisingResult
 from pose.gesture.jumping import Jumping, JumpingResult
 from pose.gesture.leaning import Leaning, LeaningResult
+from pose.gesture.pointing import Pointing, PointingResult
 from pose.gesture.shoulder_width import ShoulderWidth, ShoulderWidthResult
 from pose.gesture.steering import Steering, SteeringResult
 from pose.gesture.swiping import Swiping, SwipingResult
@@ -25,6 +26,8 @@ class Person:
         self._right_arm_raising = ArmRaising(Side.RIGHT)
         self._jumping = Jumping()
         self._leaning = Leaning()
+        self._left_hand_pointing = Pointing(Side.LEFT)
+        self._right_hand_pointing = Pointing(Side.RIGHT)
         self._shoulder_width = ShoulderWidth()
         self._steering = Steering()
         self._left_hand_swiping = Swiping(Side.LEFT)
@@ -71,6 +74,20 @@ class Person:
     @_cache
     def leaning(self) -> LeaningResult:
         return self._leaning.parse_keypoints(self.keypoints)
+
+    @property
+    @_cache
+    def left_hand_pointing(self) -> PointingResult:
+        self._left_hand_pointing.set_shoulder_width(self.shoulder_width.width)
+
+        return self._left_hand_pointing.parse_keypoints(self.keypoints)
+
+    @property
+    @_cache
+    def right_hand_pointing(self) -> PointingResult:
+        self._right_hand_pointing.set_shoulder_width(self.shoulder_width.width)
+
+        return self._right_hand_pointing.parse_keypoints(self.keypoints)
 
     @property
     @_cache
