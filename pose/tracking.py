@@ -21,17 +21,21 @@ class Tracking:
         self,
         track_ids: list[int],
         timestamp: float | None = None,
-    ) -> None:
+    ) -> list[int]:
         if timestamp is None:
             timestamp = time.perf_counter()
 
         for track_id in track_ids:
             self._track_last_seen[track_id] = timestamp
 
+        retired_track_ids: list[int] = []
         for track_id, last_seen in self._track_last_seen.copy().items():
             if timestamp - last_seen > self._tracking_timeout:
+                retired_track_ids.append(track_id)
                 del self._track_last_seen[track_id]
                 self.person_to_track = {key: value for key, value in self.person_to_track.items() if value != track_id}
+
+        return retired_track_ids
 
     def assign_tracks(
         self,
