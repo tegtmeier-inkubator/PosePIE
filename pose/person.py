@@ -68,6 +68,8 @@ class Person:
     @property
     @_cache
     def jumping(self) -> JumpingResult:
+        self._jumping.set_shoulder_width(self.shoulder_width.width)
+
         return self._jumping.parse_keypoints(self.keypoints)
 
     @property

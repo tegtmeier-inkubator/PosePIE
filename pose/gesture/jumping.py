@@ -16,13 +16,17 @@ class JumpingResult:
 
 class Jumping(GestureBase[JumpingResult]):
     def __init__(self) -> None:
+        self._shoulder_width: float = 0.0
         self._hip_center_old: npt.NDArray[np.float64] | None = None
         self._hip_center_diff = np.array([0.0, 0.0])
 
-        self._sensitivity: float = 0.01
+        self._sensitivity: float = 10.0
 
     def set_sensitivity(self, sensitivity: float) -> None:
         self._sensitivity = sensitivity
+
+    def set_shoulder_width(self, shoulder_width: float) -> None:
+        self._shoulder_width = shoulder_width
 
     def parse_keypoints(self, keypoints: Keypoints) -> JumpingResult:
         if keypoints.left_hip.conf > 0.8 and keypoints.right_hip.conf > 0.8:
@@ -36,6 +40,6 @@ class Jumping(GestureBase[JumpingResult]):
             self._hip_center_old = None
             self._hip_center_diff = np.array([0.0, 0.0])
 
-        detected = Vector2(self._hip_center_diff).y < -self._sensitivity
+        detected = Vector2(self._hip_center_diff).y < -self._shoulder_width / self._sensitivity
 
         return JumpingResult(detected)
