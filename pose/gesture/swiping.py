@@ -52,10 +52,10 @@ class Swiping(GestureBase[SwipingResult]):
         angle = np.degrees(np.arctan2(-position_diff_vector.y, -position_diff_vector.x))
 
         if norm > swipe_threshold_in:
-            self._left = angle < -135 or angle > 135
-            self._right = -45 < angle < 45
-            self._up = 45 < angle < 135
-            self._down = -135 < angle < -45
+            self._left = bool(angle < -135 or angle > 135)
+            self._right = bool(-45 < angle < 45)
+            self._up = bool(45 < angle < 135)
+            self._down = bool(-135 < angle < -45)
         elif norm < swipe_threshold_out:
             self._left = False
             self._right = False
