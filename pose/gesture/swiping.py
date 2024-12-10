@@ -22,12 +22,16 @@ class Swiping(GestureBase[SwipingResult]):
     def __init__(self, side: Side):
         self._side = side
 
+        self._shoulder_width: float = 0.0
         self._position_old: npt.NDArray[np.float64] | None = None
         self._position_diff = np.array([0.0, 0.0])
         self._left: bool = False
         self._right: bool = False
         self._up: bool = False
         self._down: bool = False
+
+    def set_shoulder_width(self, shoulder_width: float) -> None:
+        self._shoulder_width = shoulder_width
 
     def parse_keypoints(self, keypoints: Keypoints) -> SwipingResult:
         if self._side is Side.LEFT:
@@ -44,7 +48,7 @@ class Swiping(GestureBase[SwipingResult]):
             self._position_old = None
             self._position_diff = np.array([0.0, 0.0])
 
-        swipe_threshold_in = 0.05
+        swipe_threshold_in = self._shoulder_width / 4
         swipe_threshold_out = swipe_threshold_in / 4
 
         position_diff_vector = Vector2(self._position_diff)

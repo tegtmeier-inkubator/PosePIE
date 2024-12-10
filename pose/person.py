@@ -104,9 +104,13 @@ class Person:
     @property
     @_cache
     def left_hand_swiping(self) -> SwipingResult:
+        self._left_hand_swiping.set_shoulder_width(self.shoulder_width.width)
+
         return self._left_hand_swiping.parse_keypoints(self.keypoints)
 
     @property
     @_cache
     def right_hand_swiping(self) -> SwipingResult:
+        self._right_hand_swiping.set_shoulder_width(self.shoulder_width.width)
+
         return self._right_hand_swiping.parse_keypoints(self.keypoints)
