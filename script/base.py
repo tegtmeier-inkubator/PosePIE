@@ -48,6 +48,7 @@ class ScriptBase(ABC):
 
     def run(self) -> None:
         camera = Camera(self._config.camera)
+        print(f"Opened camera with {camera.width}x{camera.height}@{camera.fps} ({camera.format_fourcc})")
 
         try:
             for plugin in self._plugins:
