@@ -1,6 +1,56 @@
 import numpy as np
 
-from utils.filter import Derivative, FallingEdge, RisingEdge, Turbo
+from utils.filter import Derivative, Ewma, FallingEdge, RisingEdge, Turbo
+
+
+class TestEwma:
+    def test_time_constant(self) -> None:
+        ewma = Ewma(1.0)
+
+        for i, timestamp in enumerate(np.linspace(0.0, 1.0, 60)):
+            value = 1.0 if i != 0 else 0.0
+
+            ewma_value = ewma(value, timestamp)
+
+        np.testing.assert_approx_equal(ewma_value, 1 - (1 / np.e))
+
+    def test_time_constant_zero(self) -> None:
+        ewma = Ewma(0.0)
+
+        for i, timestamp in enumerate(np.linspace(0.0, 1.0, 60)):
+            value = 1.0 if i != 0 else 0.0
+
+            ewma_value = ewma(value, timestamp)
+
+            np.testing.assert_approx_equal(ewma_value, value)
+
+    def test_time_constant_negative(self) -> None:
+        ewma = Ewma(-1.0)
+
+        for i, timestamp in enumerate(np.linspace(0.0, 1.0, 60)):
+            value = 1.0 if i != 0 else 0.0
+
+            ewma_value = ewma(value, timestamp)
+
+            np.testing.assert_approx_equal(ewma_value, value)
+
+    def test_different_fps(self) -> None:
+        ewma_60fps = Ewma()
+        ewma_30fps = Ewma()
+        ewma_15fps = Ewma()
+
+        for i, timestamp in enumerate(np.linspace(0.0, 1.0, 60)):
+            value = 1.0 if i != 0 else 0.0
+
+            ewma_60fps_value = ewma_60fps(value, timestamp)
+
+            if i % 2 == 0:
+                ewma_30fps_value = ewma_30fps(value, timestamp)
+                np.testing.assert_approx_equal(ewma_30fps_value, ewma_60fps_value)
+
+            if i % 4 == 0:
+                ewma_15fps_value = ewma_15fps(value, timestamp)
+                np.testing.assert_approx_equal(ewma_15fps_value, ewma_60fps_value)
 
 
 class TestDerivative:
@@ -37,15 +87,8 @@ class TestDerivative:
         assert derivative(np.array([1.0]), timestamp=0.0) == 0.0
         assert np.isinf(derivative(np.array([2.0]), timestamp=0.0))
 
-    def test_filter_coefficient(self) -> None:
-        derivative = Derivative(filter_coefficient=0.9)
-
-        assert derivative(np.array([1.0]), timestamp=0.0) == 0.00
-        assert derivative(np.array([2.0]), timestamp=1.0) == 0.90
-        assert derivative(np.array([3.0]), timestamp=2.0) == 0.99
-
     def test_without_timestamp(self) -> None:
-        derivative = Derivative(filter_coefficient=0.9)
+        derivative = Derivative()
 
         assert derivative(np.array([1.0])) == 0.00
         assert not np.isinf(derivative(np.array([2.0])))

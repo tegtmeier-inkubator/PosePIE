@@ -8,13 +8,13 @@ import numpy.typing as npt
 
 
 class Derivative:
-    def __init__(self, filter_coefficient: float = 1.0) -> None:
-        self._filter_coefficient = filter_coefficient
-
-        self._diff: npt.NDArray[np.float64] | float | None = None
-
+    def __init__(self) -> None:
         self._old_timestamp: float | None = None
         self._old_value: npt.NDArray[np.float64] | float | None = None
+
+    def reset(self) -> None:
+        self._old_timestamp = None
+        self._old_value = None
 
     @overload
     def __call__(self, value: npt.NDArray[np.float64], timestamp: float | None = None) -> npt.NDArray[np.float64]: ...
@@ -24,9 +24,6 @@ class Derivative:
         if timestamp is None:
             timestamp = time.perf_counter()
 
-        if self._diff is None:
-            self._diff = np.zeros_like(value) if isinstance(value, np.ndarray) else 0.0
-
         if self._old_value is not None and self._old_timestamp is not None:
             time_diff = timestamp - self._old_timestamp
             diff = (
@@ -34,12 +31,46 @@ class Derivative:
                 if time_diff != 0.0
                 else np.full_like(value, np.inf) if isinstance(value, np.ndarray) else np.inf
             )
-            self._diff = (1 - self._filter_coefficient) * self._diff + self._filter_coefficient * diff
+        else:
+            diff = np.zeros_like(value) if isinstance(value, np.ndarray) else 0.0
 
         self._old_timestamp = timestamp
         self._old_value = value
 
-        return self._diff
+        return diff
+
+
+class Ewma:
+    def __init__(self, time_constant: float = 1.0) -> None:
+        self._time_constant = time_constant
+
+        self._old_timestamp: float | None = None
+        self._value: npt.NDArray[np.float64] | float | None = None
+
+    def reset(self) -> None:
+        self._old_timestamp = None
+        self._value = None
+
+    @overload
+    def __call__(self, value: npt.NDArray[np.float64], timestamp: float | None = None) -> npt.NDArray[np.float64]: ...
+    @overload
+    def __call__(self, value: float, timestamp: float | None = None) -> float: ...
+    def __call__(self, value: npt.NDArray[np.float64] | float, timestamp: float | None = None) -> npt.NDArray[np.float64] | float:
+        if timestamp is None:
+            timestamp = time.perf_counter()
+
+        if self._value is None:
+            self._value = value
+
+        if self._old_timestamp is not None:
+            time_diff = timestamp - self._old_timestamp
+
+            alpha = float(1.0 - np.exp(-time_diff / self._time_constant)) if self._time_constant > 0.0 else 1.0
+            self._value = alpha * value + (1 - alpha) * self._value
+
+        self._old_timestamp = timestamp
+
+        return self._value
 
 
 class RisingEdge:

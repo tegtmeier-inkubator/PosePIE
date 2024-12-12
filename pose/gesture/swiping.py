@@ -2,10 +2,9 @@ from dataclasses import dataclass
 
 import numpy as np
 
-import numpy.typing as npt
-
 from pose.gesture.base import GestureBase
 from pose.keypoints import Keypoints
+from utils.filter import Derivative, Ewma
 from utils.side import Side
 from utils.vector import Vector2
 
@@ -23,8 +22,8 @@ class Swiping(GestureBase[SwipingResult]):
         self._side = side
 
         self._shoulder_width: float = 0.0
-        self._position_old: npt.NDArray[np.float64] | None = None
-        self._position_diff = np.array([0.0, 0.0])
+        self._position_diff = Derivative()
+        self._position_ewma = Ewma(0.1)
         self._left: bool = False
         self._right: bool = False
         self._up: bool = False
@@ -40,18 +39,16 @@ class Swiping(GestureBase[SwipingResult]):
             wrist = keypoints.right_wrist
 
         if wrist.conf > 0.8:
-            if self._position_old is not None:
-                alpha = 1.0
-                self._position_diff = (1 - alpha) * self._position_diff + alpha * (wrist.xy - self._position_old)
-            self._position_old = wrist.xy
+            position_diff = self._position_ewma(self._position_diff(wrist.xy))
         else:
-            self._position_old = None
-            self._position_diff = np.array([0.0, 0.0])
+            self._position_diff.reset()
+            self._position_ewma.reset()
+            position_diff = np.array([0.0, 0.0])
 
-        swipe_threshold_in = self._shoulder_width / 4
+        swipe_threshold_in = self._shoulder_width * 6
         swipe_threshold_out = swipe_threshold_in / 4
 
-        position_diff_vector = Vector2(self._position_diff)
+        position_diff_vector = Vector2(position_diff)
         norm = np.linalg.norm(position_diff_vector.xy)
         angle = np.degrees(np.arctan2(-position_diff_vector.y, -position_diff_vector.x))
 
