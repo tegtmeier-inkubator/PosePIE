@@ -43,7 +43,7 @@ class Camera:
 
         self._cap = cv2.VideoCapture(self._config.device)
         if self._config.format_fourcc is not None:
-            self._cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*self._config.format_fourcc.upper()))
+            self._cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc(*self._config.format_fourcc.upper()))
         if self._config.width is not None:
             self._cap.set(cv2.CAP_PROP_FRAME_WIDTH, self._config.width)
         if self._config.height is not None:
