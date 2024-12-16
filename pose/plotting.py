@@ -18,17 +18,14 @@ def get_player_color(player_id: int) -> tuple[int, int, int]:
     return PLAYER_COLORS[player_id % len(PLAYER_COLORS)]
 
 
-def annotate_frame(frame: MatLike, pose_result: PoseFrameResult, max_num_players: int) -> None:
-    assert max_num_players >= 1
-
-    annotator = Annotator(frame)
-
+def _annotate_persons(frame: MatLike, pose_result: PoseFrameResult) -> None:
     player_ids = (
         {player.track_id: player_id for player_id, player in enumerate(pose_result.stats.player_stats)}
         if pose_result.stats.player_stats is not None
         else {}
     )
 
+    annotator = Annotator(frame)
     for bbox, keypoints in zip(pose_result.result.boxes, pose_result.result.keypoints):
         if bbox.id is None:
             continue
@@ -44,6 +41,10 @@ def annotate_frame(frame: MatLike, pose_result: PoseFrameResult, max_num_players
             )
         else:
             annotator.box_label(bbox.xyxy.squeeze())
+
+
+def _draw_footer(frame: MatLike, pose_result: PoseFrameResult, max_num_players: int) -> None:
+    assert max_num_players >= 1
 
     joinable = True
     for player_id, player in enumerate(pose_result.stats.player_stats):
@@ -84,6 +85,8 @@ def annotate_frame(frame: MatLike, pose_result: PoseFrameResult, max_num_players
             (255, 255, 255),
         )
 
+
+def _add_inference_stats(frame: MatLike, pose_result: PoseFrameResult) -> None:
     cv2.putText(
         frame,
         f"{pose_result.result.speed["preprocess"]:.1f}ms preprocess, {pose_result.result.speed["inference"]:.1f}ms inference, {pose_result.result.speed["postprocess"]:.1f}ms postprocess",
@@ -92,3 +95,9 @@ def annotate_frame(frame: MatLike, pose_result: PoseFrameResult, max_num_players
         0.75,
         (255, 255, 255),
     )
+
+
+def annotate_frame(frame: MatLike, pose_result: PoseFrameResult, max_num_players: int) -> None:
+    _annotate_persons(frame, pose_result)
+    _draw_footer(frame, pose_result, max_num_players)
+    _add_inference_stats(frame, pose_result)
