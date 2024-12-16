@@ -13,7 +13,7 @@ from utils.side import Side
 @dataclass
 class PointingResult:
     detected: bool
-    xy: npt.NDArray[np.float32]
+    xy: npt.NDArray[np.float64]
 
 
 class Pointing(GestureBase[PointingResult]):
