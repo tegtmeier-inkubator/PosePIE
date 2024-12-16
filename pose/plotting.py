@@ -83,3 +83,12 @@ def annotate_frame(frame: MatLike, pose_result: PoseFrameResult, max_num_players
             1.0,
             (255, 255, 255),
         )
+
+    cv2.putText(
+        frame,
+        f"{pose_result.result.speed["preprocess"]:.1f}ms preprocess, {pose_result.result.speed["inference"]:.1f}ms inference, {pose_result.result.speed["postprocess"]:.1f}ms postprocess",
+        (8, 16),
+        cv2.FONT_HERSHEY_PLAIN,
+        0.75,
+        (255, 255, 255),
+    )

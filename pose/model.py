@@ -111,6 +111,7 @@ class PoseModel:
             imgsz=1280 if "-p6" in self._config.model else 640,
             conf=self._config.min_bbox_conf,
             device=self._config.device,
+            verbose=False,
         )
         stats = self._parse_results(results[0], frame.shape)
 
