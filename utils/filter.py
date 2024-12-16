@@ -8,6 +8,14 @@ import numpy.typing as npt
 
 
 class Derivative:
+    """
+    >>> derivative = Derivative()
+    >>> derivative(1.0, timestamp = 0.0)
+    0.0
+    >>> derivative(2.0, timestamp = 1.0)
+    1.0
+    """
+
     def __init__(self) -> None:
         self._old_timestamp: float | None = None
         self._old_value: npt.NDArray[np.float64] | float | None = None
@@ -41,6 +49,16 @@ class Derivative:
 
 
 class Ewma:
+    """
+    >>> ewma = Ewma()
+    >>> ewma(0.0, timestamp = 0.0)
+    0.0
+    >>> ewma(1.0, timestamp = 0.0)
+    0.0
+    >>> ewma(1.0, timestamp = 1.0)
+    0.6321205588285577
+    """
+
     def __init__(self, time_constant: float = 1.0) -> None:
         self._time_constant = time_constant
 
@@ -74,6 +92,16 @@ class Ewma:
 
 
 class RisingEdge:
+    """
+    >>> rising_edge = RisingEdge()
+    >>> rising_edge(True)
+    False
+    >>> rising_edge(False)
+    False
+    >>> rising_edge(True)
+    True
+    """
+
     def __init__(self) -> None:
         self._old_value = True
 
@@ -84,6 +112,16 @@ class RisingEdge:
 
 
 class FallingEdge:
+    """
+    >>> falling_edge = FallingEdge()
+    >>> falling_edge(False)
+    False
+    >>> falling_edge(True)
+    False
+    >>> falling_edge(False)
+    True
+    """
+
     def __init__(self) -> None:
         self._old_value = False
 
@@ -94,6 +132,16 @@ class FallingEdge:
 
 
 class Turbo:
+    """
+    >>> turbo = Turbo(1.0)
+    >>> turbo(True, timestamp=0.0)
+    True
+    >>> turbo(True, timestamp=0.5)
+    False
+    >>> turbo(True, timestamp=1.0)
+    True
+    """
+
     def __init__(self, interval: float) -> None:
         self._interval = interval
 
