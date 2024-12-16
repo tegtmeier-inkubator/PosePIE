@@ -57,40 +57,40 @@ class TestDerivative:
     def test_derivative(self) -> None:
         derivative = Derivative()
 
-        assert derivative(np.array([1.0]), timestamp=0.0) == 0.0
-        assert derivative(np.array([1.0]), timestamp=1.0) == 0.0
-        assert derivative(np.array([2.0]), timestamp=2.0) == 1.0
-        assert derivative(np.array([2.5]), timestamp=3.0) == 0.5
-        assert derivative(np.array([3.0]), timestamp=3.5) == 1.0
+        np.testing.assert_approx_equal(derivative(np.array([1.0]), timestamp=0.0), 0.0)
+        np.testing.assert_approx_equal(derivative(np.array([1.0]), timestamp=1.0), 0.0)
+        np.testing.assert_approx_equal(derivative(np.array([2.0]), timestamp=2.0), 1.0)
+        np.testing.assert_approx_equal(derivative(np.array([2.5]), timestamp=3.0), 0.5)
+        np.testing.assert_approx_equal(derivative(np.array([3.0]), timestamp=3.5), 1.0)
 
     def test_negative_values(self) -> None:
         derivative = Derivative()
 
-        assert derivative(np.array([-1.0]), timestamp=0.0) == 0.0
-        assert derivative(np.array([-1.0]), timestamp=1.0) == 0.0
-        assert derivative(np.array([-2.0]), timestamp=2.0) == -1.0
-        assert derivative(np.array([-2.5]), timestamp=3.0) == -0.5
-        assert derivative(np.array([-3.0]), timestamp=3.5) == -1.0
+        np.testing.assert_approx_equal(derivative(np.array([-1.0]), timestamp=0.0), 0.0)
+        np.testing.assert_approx_equal(derivative(np.array([-1.0]), timestamp=1.0), 0.0)
+        np.testing.assert_approx_equal(derivative(np.array([-2.0]), timestamp=2.0), -1.0)
+        np.testing.assert_approx_equal(derivative(np.array([-2.5]), timestamp=3.0), -0.5)
+        np.testing.assert_approx_equal(derivative(np.array([-3.0]), timestamp=3.5), -1.0)
 
     def test_negative_time(self) -> None:
         derivative = Derivative()
 
-        assert derivative(np.array([1.0]), timestamp=0.0) == 0.0
-        assert derivative(np.array([1.0]), timestamp=-1.0) == 0.0
-        assert derivative(np.array([2.0]), timestamp=-2.0) == -1.0
-        assert derivative(np.array([2.5]), timestamp=-3.0) == -0.5
-        assert derivative(np.array([3.0]), timestamp=-3.5) == -1.0
+        np.testing.assert_approx_equal(derivative(np.array([1.0]), timestamp=0.0), 0.0)
+        np.testing.assert_approx_equal(derivative(np.array([1.0]), timestamp=-1.0), 0.0)
+        np.testing.assert_approx_equal(derivative(np.array([2.0]), timestamp=-2.0), -1.0)
+        np.testing.assert_approx_equal(derivative(np.array([2.5]), timestamp=-3.0), -0.5)
+        np.testing.assert_approx_equal(derivative(np.array([3.0]), timestamp=-3.5), -1.0)
 
     def test_no_time_difference(self) -> None:
         derivative = Derivative()
 
-        assert derivative(np.array([1.0]), timestamp=0.0) == 0.0
+        np.testing.assert_approx_equal(derivative(np.array([1.0]), timestamp=0.0), 0.0)
         assert np.isinf(derivative(np.array([2.0]), timestamp=0.0))
 
     def test_without_timestamp(self) -> None:
         derivative = Derivative()
 
-        assert derivative(np.array([1.0])) == 0.00
+        np.testing.assert_approx_equal(derivative(np.array([1.0])), 0.0)
         assert not np.isinf(derivative(np.array([2.0])))
 
 

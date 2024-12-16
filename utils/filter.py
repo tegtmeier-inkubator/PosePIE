@@ -28,7 +28,7 @@ class Derivative:
             time_diff = timestamp - self._old_timestamp
             diff = (
                 (value - self._old_value) / (timestamp - self._old_timestamp)
-                if time_diff != 0.0
+                if not np.isclose(time_diff, 0.0)
                 else np.full_like(value, np.inf) if isinstance(value, np.ndarray) else np.inf
             )
         else:
