@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import os
 from pathlib import Path
 
@@ -39,6 +40,25 @@ class PoseModelConfig(BaseModel):
         default=4.0,
         description="time in seconds until invisible person is unassined",
     )
+
+
+@dataclass
+class PosePlayerStats:
+    track_id: int | None
+    visible: bool
+    timeout: float | None
+
+
+@dataclass
+class PoseStats:
+    unassigned_track_ids: list[int]
+    player_stats: list[PosePlayerStats]
+
+
+@dataclass
+class PoseFrameResult:
+    result: Any
+    stats: PoseStats
 
 
 def correct_aspect_ratio(
@@ -84,7 +104,7 @@ class PoseModel:
 
         self.person = [Person() for _ in range(max_num_persons)]
 
-    def process_frame(self, frame: MatLike) -> Any:
+    def process_frame(self, frame: MatLike) -> PoseFrameResult:
         results = self._model.track(
             frame,
             persist=True,
@@ -92,11 +112,11 @@ class PoseModel:
             conf=self._config.min_bbox_conf,
             device=self._config.device,
         )
-        self._parse_results(results[0], frame.shape)
+        stats = self._parse_results(results[0], frame.shape)
 
-        return results[0]
+        return PoseFrameResult(results[0], stats)
 
-    def _parse_results(self, result: Any, frame_shape: tuple[int, int]) -> None:
+    def _parse_results(self, result: Any, frame_shape: tuple[int, int]) -> PoseStats:
         if result.boxes.conf is not None and result.boxes.id is not None and result.keypoints.conf is not None:
             bboxes = result.boxes.xyxyn.cpu().numpy()
             track_ids = result.boxes.id.int().cpu().tolist()
@@ -113,22 +133,24 @@ class PoseModel:
         self._tracking.retire_tracks(track_ids)
 
         unassigned_track_ids = self._tracking.assign_tracks(track_ids, keypoints, keypoints_scores)
-        print(f"Unassigned tracks: {unassigned_track_ids}")
 
+        player_stats: list[PosePlayerStats] = []
         for person_id, person in enumerate(self.person):
             try:
                 track_id = self._tracking.person_to_track[person_id]
             except KeyError:
-                print(f"Player {person_id+1}: not assigned")
                 person.parse_keypoints(np.zeros((17, 2)), np.zeros((17,)))
+                player_stats.append(PosePlayerStats(track_id=None, visible=False, timeout=None))
                 continue
 
             try:
                 idx = track_ids.index(track_id)
             except ValueError:
-                print(f"Player {person_id+1}: assigned to track {track_id} - not visible")
                 person.parse_keypoints(np.zeros((17, 2)), np.zeros((17,)))
+                player_stats.append(PosePlayerStats(track_id, visible=False, timeout=self._tracking.get_track_timeout(track_id)))
                 continue
 
-            print(f"Player {person_id+1}: assigned to track {track_id} - {bboxes[idx]}")
             person.parse_keypoints(keypoints[idx], keypoints_scores[idx])
+            player_stats.append(PosePlayerStats(track_id, visible=True, timeout=None))
+
+        return PoseStats(unassigned_track_ids, player_stats)

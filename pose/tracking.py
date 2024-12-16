@@ -59,3 +59,13 @@ class Tracking:
                         break
 
         return unassigned_track_ids
+
+    def get_track_timeout(
+        self,
+        track_id: int,
+        timestamp: float | None = None,
+    ) -> float:
+        if timestamp is None:
+            timestamp = time.perf_counter()
+
+        return self._tracking_timeout - (timestamp - self._track_last_seen[track_id])
