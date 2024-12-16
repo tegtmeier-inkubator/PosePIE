@@ -45,7 +45,7 @@ class Pointing(GestureBase[PointingResult]):
             self._reference_shoulder_xy = self._reference_shoulder_xy_ewma(reference_shoulder.xy)
 
         detected = False
-        if reference_shoulder.conf > 0.8 and wrist.conf > 0.8:
+        if reference_shoulder.conf > 0.8 and wrist.conf > 0.8 and self._shoulder_width > 0.0:
             xy = (wrist.xy - self._reference_shoulder_xy) / self._shoulder_width
             if self._ratio > 1.0:
                 xy[1] *= self._ratio
