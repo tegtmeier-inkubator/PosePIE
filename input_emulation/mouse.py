@@ -53,4 +53,7 @@ if platform == "linux":
             self._device.syn()
 
 else:
-    raise NotImplementedError(f"Mouse not supported on platform {platform}!")
+
+    class Mouse:  # type: ignore[no-redef]
+        def __init__(self, absolute: bool = False) -> None:
+            raise NotImplementedError(f"Mouse not supported on platform {platform}!")

@@ -373,4 +373,7 @@ if platform == "linux":
             self._device.syn()
 
 else:
-    raise NotImplementedError(f"Keyboard not supported on platform {platform}!")
+
+    class Keyboard:  # type: ignore[no-redef]
+        def __init__(self) -> None:
+            raise NotImplementedError(f"Keyboard not supported on platform {platform}!")
