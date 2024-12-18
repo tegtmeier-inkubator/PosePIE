@@ -72,6 +72,9 @@ class Person:
 
         return self._jumping.parse_keypoints(self.keypoints)
 
+    def set_jumping_sensitivity(self, sensitivity: float) -> None:
+        self._jumping.set_sensitivity(sensitivity)
+
     @property
     @_cache
     def leaning(self) -> LeaningResult:
@@ -84,12 +87,18 @@ class Person:
 
         return self._left_hand_pointing.parse_keypoints(self.keypoints)
 
+    def set_left_hand_pointing_aspect_ratio(self, aspect_radio: tuple[int, int]) -> None:
+        self._left_hand_pointing.set_aspect_ratio(aspect_radio)
+
     @property
     @_cache
     def right_hand_pointing(self) -> PointingResult:
         self._right_hand_pointing.set_shoulder_width(self.shoulder_width.width)
 
         return self._right_hand_pointing.parse_keypoints(self.keypoints)
+
+    def set_right_hand_pointing_aspect_ratio(self, aspect_radio: tuple[int, int]) -> None:
+        self._right_hand_pointing.set_aspect_ratio(aspect_radio)
 
     @property
     @_cache
@@ -110,9 +119,15 @@ class Person:
 
         return self._left_hand_swiping.parse_keypoints(self.keypoints)
 
+    def set_left_hand_swiping_sensitivity(self, sensitivity: float) -> None:
+        self._left_hand_swiping.set_sensitivity(sensitivity)
+
     @property
     @_cache
     def right_hand_swiping(self) -> SwipingResult:
         self._right_hand_swiping.set_shoulder_width(self.shoulder_width.width)
 
         return self._right_hand_swiping.parse_keypoints(self.keypoints)
+
+    def set_right_hand_swiping_sensitivity(self, sensitivity: float) -> None:
+        self._right_hand_swiping.set_sensitivity(sensitivity)
