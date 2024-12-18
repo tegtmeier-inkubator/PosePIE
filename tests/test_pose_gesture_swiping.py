@@ -9,6 +9,7 @@ class TestLeftHand:
     def test_left_hand_up(self) -> None:
         pose = Pose()
         swiping = Swiping(Side.LEFT)
+        swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
         for y in np.linspace(1.0, 0.0, 10):
@@ -23,6 +24,7 @@ class TestLeftHand:
     def test_left_hand_down(self) -> None:
         pose = Pose()
         swiping = Swiping(Side.LEFT)
+        swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
         for y in np.linspace(0.0, 1.0, 10):
@@ -37,6 +39,7 @@ class TestLeftHand:
     def test_left_hand_left(self) -> None:
         pose = Pose()
         swiping = Swiping(Side.LEFT)
+        swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
         for x in np.linspace(0.0, 1.0, 10):
@@ -51,6 +54,7 @@ class TestLeftHand:
     def test_left_hand_right(self) -> None:
         pose = Pose()
         swiping = Swiping(Side.LEFT)
+        swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
         for x in np.linspace(1.0, 0.0, 10):
@@ -65,6 +69,7 @@ class TestLeftHand:
     def test_left_not_detected_no_movement(self) -> None:
         pose = Pose()
         swiping = Swiping(Side.LEFT)
+        swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
         for _ in range(10):
@@ -78,6 +83,7 @@ class TestLeftHand:
     def test_left_not_detected_keypoint_threshold(self) -> None:
         pose = Pose()
         swiping = Swiping(Side.LEFT)
+        swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
         for y in np.linspace(1.0, 0.0, 10):
@@ -94,6 +100,7 @@ class TestRightHand:
     def test_right_hand_up(self) -> None:
         pose = Pose()
         swiping = Swiping(Side.RIGHT)
+        swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
         for y in np.linspace(1.0, 0.0, 10):
@@ -108,6 +115,7 @@ class TestRightHand:
     def test_right_hand_down(self) -> None:
         pose = Pose()
         swiping = Swiping(Side.RIGHT)
+        swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
         for y in np.linspace(0.0, 1.0, 10):
@@ -122,6 +130,7 @@ class TestRightHand:
     def test_right_hand_left(self) -> None:
         pose = Pose()
         swiping = Swiping(Side.RIGHT)
+        swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
         for x in np.linspace(0.0, 1.0, 10):
@@ -136,6 +145,7 @@ class TestRightHand:
     def test_right_hand_right(self) -> None:
         pose = Pose()
         swiping = Swiping(Side.RIGHT)
+        swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
         for x in np.linspace(1.0, 0.0, 10):
@@ -150,6 +160,7 @@ class TestRightHand:
     def test_right_not_detected_no_movement(self) -> None:
         pose = Pose()
         swiping = Swiping(Side.RIGHT)
+        swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
         for _ in range(10):
@@ -163,6 +174,7 @@ class TestRightHand:
     def test_right_not_detected_keypoint_threshold(self) -> None:
         pose = Pose()
         swiping = Swiping(Side.RIGHT)
+        swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
         for y in np.linspace(1.0, 0.0, 10):

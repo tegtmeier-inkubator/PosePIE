@@ -29,6 +29,11 @@ class Swiping(GestureBase[SwipingResult]):
         self._up: bool = False
         self._down: bool = False
 
+        self._sensitivity = 0.16
+
+    def set_sensitivity(self, sensitivity: float) -> None:
+        self._sensitivity = sensitivity
+
     def set_shoulder_width(self, shoulder_width: float) -> None:
         self._shoulder_width = shoulder_width
 
@@ -45,7 +50,7 @@ class Swiping(GestureBase[SwipingResult]):
             self._position_ewma.reset()
             position_diff = np.array([0.0, 0.0])
 
-        swipe_threshold_in = self._shoulder_width * 6
+        swipe_threshold_in = self._shoulder_width / self._sensitivity
         swipe_threshold_out = swipe_threshold_in / 4
 
         position_diff_vector = Vector2(position_diff)
