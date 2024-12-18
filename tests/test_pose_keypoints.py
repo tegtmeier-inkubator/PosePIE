@@ -57,7 +57,7 @@ class TestKeypoints:
             ]
         )
 
-        conf = np.linspace(0.8, 1.0, keypoints_tpose.shape[0])
+        conf = np.linspace(0.8, 1.0, keypoints_tpose.shape[0], dtype=np.float64)
 
         keypoints = Keypoints(keypoints_tpose, conf)
 
