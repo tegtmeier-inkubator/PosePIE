@@ -17,6 +17,19 @@ class TestJumping:
 
         assert result.detected is True
 
+    def test_sensitivity(self) -> None:
+        pose = Pose()
+        jumping = Jumping()
+        jumping.set_sensitivity(0.4)
+        jumping.set_shoulder_width(0.4)
+
+        for y in np.linspace(0.7, 0.2, 10):
+            pose.left_hip = np.array([0.6, y, 1.0])
+            pose.right_hip = np.array([0.4, y, 1.0])
+            result = jumping.parse_keypoints(pose.keypoints)
+
+        assert result.detected is True
+
     def test_not_detected_no_movement(self) -> None:
         pose = Pose()
         jumping = Jumping()

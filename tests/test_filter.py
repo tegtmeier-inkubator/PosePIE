@@ -34,6 +34,22 @@ class TestEwma:
 
             np.testing.assert_approx_equal(ewma_value, value)
 
+    def test_no_time_difference(self) -> None:
+        ewma = Ewma()
+
+        value = ewma(0.0, timestamp=0.0)
+        value = ewma(1.0, timestamp=0.0)
+
+        np.testing.assert_approx_equal(value, 0.0)
+
+    def test_without_timestamp(self) -> None:
+        ewma = Ewma()
+
+        value = ewma(0.0)
+        value = ewma(1.0)
+
+        assert value != 0.0
+
     def test_different_fps(self) -> None:
         ewma_60fps = Ewma()
         ewma_30fps = Ewma()
@@ -92,6 +108,24 @@ class TestDerivative:
 
         np.testing.assert_approx_equal(derivative(np.array([1.0])), 0.0)
         assert not np.isinf(derivative(np.array([2.0])))
+
+    def test_different_fps(self) -> None:
+        derivative_60fps = Derivative()
+        derivative_30fps = Derivative()
+        derivative_15fps = Derivative()
+
+        for i, timestamp in enumerate(np.linspace(0.0, 1.0, 60)):
+            value = 2 * timestamp
+
+            derivative_60fps_value = derivative_60fps(value, timestamp)
+
+            if i % 2 == 0:
+                derivative_30fps_value = derivative_30fps(value, timestamp)
+                np.testing.assert_approx_equal(derivative_30fps_value, derivative_60fps_value)
+
+            if i % 4 == 0:
+                derivative_15fps_value = derivative_15fps(value, timestamp)
+                np.testing.assert_approx_equal(derivative_15fps_value, derivative_60fps_value)
 
 
 class TestRisingEdge:

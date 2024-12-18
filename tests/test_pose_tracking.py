@@ -125,8 +125,10 @@ class TestTracking:
         assert len(unassigned_track_ids) == 0
         assert 0 in tracking.person_to_track
         assert tracking.person_to_track[0] == 1
+        np.testing.assert_approx_equal(tracking.get_track_timeout(tracking.person_to_track[0], timestamp=6.0), 1.0)
         assert 1 in tracking.person_to_track
         assert tracking.person_to_track[1] == 2
+        np.testing.assert_approx_equal(tracking.get_track_timeout(tracking.person_to_track[1], timestamp=6.0), 4.0)
         assert 2 not in tracking.person_to_track
         assert 3 not in tracking.person_to_track
 
@@ -151,6 +153,7 @@ class TestTracking:
         assert 0 not in tracking.person_to_track
         assert 1 in tracking.person_to_track
         assert tracking.person_to_track[1] == 2
+        np.testing.assert_approx_equal(tracking.get_track_timeout(tracking.person_to_track[1], timestamp=8.0), 4.0)
         assert 2 not in tracking.person_to_track
         assert 3 not in tracking.person_to_track
 
