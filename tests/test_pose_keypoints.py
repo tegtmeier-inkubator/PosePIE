@@ -37,23 +37,23 @@ class TestKeypoints:
     def test_members(self) -> None:
         keypoints_tpose = np.array(
             [
-                [0.5, 0.9],  # Nose
-                [0.45, 0.92],  # Left eye
-                [0.55, 0.92],  # Right eye
-                [0.4, 0.9],  # Left ear
-                [0.6, 0.9],  # Right ear
-                [0.3, 0.7],  # Left shoulder
-                [0.7, 0.7],  # Right shoulder
-                [0.2, 0.7],  # Left elbow
-                [0.8, 0.7],  # Right elbow
-                [0.1, 0.7],  # Left wrist
-                [0.9, 0.7],  # Right wrist
-                [0.4, 0.5],  # Left hip
-                [0.6, 0.5],  # Right hip
-                [0.4, 0.3],  # Left knee
-                [0.6, 0.3],  # Right knee
-                [0.4, 0.1],  # Left ankle
-                [0.6, 0.1],  # Right ankle
+                [0.5, 0.1],  # Nose
+                [0.55, 0.08],  # Left eye
+                [0.45, 0.08],  # Right eye
+                [0.6, 0.1],  # Left ear
+                [0.4, 0.1],  # Right ear
+                [0.7, 0.3],  # Left shoulder
+                [0.3, 0.3],  # Right shoulder
+                [0.8, 0.3],  # Left elbow
+                [0.2, 0.3],  # Right elbow
+                [0.9, 0.3],  # Left wrist
+                [0.1, 0.3],  # Right wrist
+                [0.6, 0.5],  # Left hip
+                [0.4, 0.5],  # Right hip
+                [0.6, 0.7],  # Left knee
+                [0.4, 0.7],  # Right knee
+                [0.6, 0.9],  # Left ankle
+                [0.4, 0.9],  # Right ankle
             ]
         )
 
