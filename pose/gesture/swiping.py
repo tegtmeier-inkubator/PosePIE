@@ -8,6 +8,10 @@ from utils.filter import Derivative, Ewma
 from utils.side import Side
 from utils.vector import Vector2
 
+POSITION_EWMA_TIME_CONSTANT = 0.1
+DEFAULT_SENSITIVITY = 0.16
+SWIPE_THRESHOLD_OUT_FACTOR = 0.25
+
 
 @dataclass
 class SwipingResult:
@@ -24,13 +28,13 @@ class Swiping(GestureBase[SwipingResult]):
 
         self._shoulder_width: float = 0.0
         self._position_diff = Derivative()
-        self._position_ewma = Ewma(0.1)
+        self._position_ewma = Ewma(POSITION_EWMA_TIME_CONSTANT)
         self._left: bool = False
         self._right: bool = False
         self._up: bool = False
         self._down: bool = False
 
-        self._sensitivity = 0.16
+        self._sensitivity = DEFAULT_SENSITIVITY
 
     def set_sensitivity(self, sensitivity: float) -> None:
         self._sensitivity = sensitivity
@@ -52,7 +56,7 @@ class Swiping(GestureBase[SwipingResult]):
             position_diff = np.array([0.0, 0.0])
 
         swipe_threshold_in = self._shoulder_width / self._sensitivity
-        swipe_threshold_out = swipe_threshold_in / 4
+        swipe_threshold_out = swipe_threshold_in * SWIPE_THRESHOLD_OUT_FACTOR
 
         position_diff_vector = Vector2(position_diff)
         norm = np.linalg.norm(position_diff_vector.xy)

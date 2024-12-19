@@ -6,6 +6,8 @@ from pose.gesture.base import GestureBase
 from pose.keypoints import Keypoints
 from utils.filter import Ewma
 
+SHOULDER_WIDTH_EWMA_TIME_CONSTANT = 0.5
+
 
 @dataclass
 class ShoulderWidthResult:
@@ -18,7 +20,7 @@ class ShoulderWidth(GestureBase[ShoulderWidthResult]):
         self._min_keypoint_conf = min_keypoint_conf
 
         self._shoulder_width: float = 0.0
-        self._shoulder_width_ewma = Ewma(0.5)
+        self._shoulder_width_ewma = Ewma(SHOULDER_WIDTH_EWMA_TIME_CONSTANT)
 
     def parse_keypoints(self, keypoints: Keypoints) -> ShoulderWidthResult:
         if keypoints.left_shoulder.conf > self._min_keypoint_conf and keypoints.right_shoulder.conf > self._min_keypoint_conf:

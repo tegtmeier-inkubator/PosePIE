@@ -7,6 +7,9 @@ from pose.keypoints import Keypoints
 from utils.filter import Derivative, Ewma
 from utils.vector import Vector2
 
+HIP_CENTER_EWMA_TIME_CONSTANT = 0.1
+DEFAULT_SENSITIVITY = 0.4
+
 
 @dataclass
 class JumpingResult:
@@ -19,9 +22,9 @@ class Jumping(GestureBase[JumpingResult]):
 
         self._shoulder_width: float = 0.0
         self._hip_center_diff = Derivative()
-        self._hip_center_ewma = Ewma(0.1)
+        self._hip_center_ewma = Ewma(HIP_CENTER_EWMA_TIME_CONSTANT)
 
-        self._sensitivity: float = 0.4
+        self._sensitivity: float = DEFAULT_SENSITIVITY
 
     def set_sensitivity(self, sensitivity: float) -> None:
         self._sensitivity = sensitivity

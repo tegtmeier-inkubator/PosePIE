@@ -9,6 +9,11 @@ from pose.keypoints import Keypoints
 from utils.filter import Ewma
 from utils.side import Side
 
+DEFAULT_ASPECT_RATIO = 16 / 9
+REFERENCE_SHOULDER_XY_EWMA_TIME_CONSTANT = 0.2
+XY_EWMA_TIME_CONSTANT = 0.1
+DETECTION_AREA_FACTOR = 1.25
+
 
 @dataclass
 class PointingResult:
@@ -21,15 +26,15 @@ class Pointing(GestureBase[PointingResult]):
         self._min_keypoint_conf = min_keypoint_conf
         self._side = side
 
+        self._aspect_ratio = DEFAULT_ASPECT_RATIO
         self._shoulder_width: float = 0.0
-        self._ratio = 16 / 9
         self._reference_shoulder_xy = np.array([0.0, 0.0])
-        self._reference_shoulder_xy_ewma = Ewma(0.2)
+        self._reference_shoulder_xy_ewma = Ewma(REFERENCE_SHOULDER_XY_EWMA_TIME_CONSTANT)
         self._xy = np.array([0.0, 0.0])
-        self._xy_ewma = Ewma(0.1)
+        self._xy_ewma = Ewma(XY_EWMA_TIME_CONSTANT)
 
     def set_aspect_ratio(self, aspect_radio: tuple[float, float]) -> None:
-        self._ratio = aspect_radio[0] / aspect_radio[1]
+        self._aspect_ratio = aspect_radio[0] / aspect_radio[1]
 
     def set_shoulder_width(self, shoulder_width: float) -> None:
         self._shoulder_width = shoulder_width
@@ -48,12 +53,12 @@ class Pointing(GestureBase[PointingResult]):
         detected = False
         if reference_shoulder.conf > self._min_keypoint_conf and wrist.conf > self._min_keypoint_conf and self._shoulder_width > 0.0:
             xy = (wrist.xy - self._reference_shoulder_xy) / self._shoulder_width
-            if self._ratio > 1.0:
-                xy[1] *= self._ratio
-            elif self._ratio < 1.0:
-                xy[0] /= self._ratio
+            if self._aspect_ratio > 1.0:
+                xy[1] *= self._aspect_ratio
+            elif self._aspect_ratio < 1.0:
+                xy[0] /= self._aspect_ratio
 
-            if (np.abs(xy) < 1.25).all():
+            if (np.abs(xy) < DETECTION_AREA_FACTOR).all():
                 xy = np.clip(xy, -1.0, 1.0)
                 self._xy = self._xy_ewma(xy)
 

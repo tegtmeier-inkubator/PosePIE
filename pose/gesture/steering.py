@@ -6,6 +6,8 @@ from pose.gesture.base import GestureBase
 from pose.keypoints import Keypoints
 from utils.vector import Vector2
 
+DETECTION_FACTOR = 1.5
+
 
 @dataclass
 class SteeringResult:
@@ -26,7 +28,7 @@ class Steering(GestureBase[SteeringResult]):
         if keypoints.left_wrist.conf > self._min_keypoint_conf and keypoints.right_wrist.conf > self._min_keypoint_conf:
             steering_vector = Vector2(keypoints.left_wrist.xy - keypoints.right_wrist.xy)
 
-            detected = float(np.linalg.norm(steering_vector.xy)) < self._shoulder_width * 1.5
+            detected = float(np.linalg.norm(steering_vector.xy)) < self._shoulder_width * DETECTION_FACTOR
             angle = float(-np.degrees(np.atan2(steering_vector.y, steering_vector.x)))
         else:
             detected = False

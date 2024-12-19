@@ -14,7 +14,7 @@ from pose.model import PoseModel
 from pose.plotting import annotate_frame
 from script.plugin import PluginBase
 
-CV2_WINDOW_TITLE = "Camera"
+CV2_WINDOW_TITLE = "PosePIE"
 
 
 class ScriptBase(ABC):
