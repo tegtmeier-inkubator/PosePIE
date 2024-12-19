@@ -14,12 +14,14 @@ class ShoulderWidthResult:
 
 
 class ShoulderWidth(GestureBase[ShoulderWidthResult]):
-    def __init__(self) -> None:
+    def __init__(self, min_keypoint_conf: float) -> None:
+        self._min_keypoint_conf = min_keypoint_conf
+
         self._shoulder_width: float = 0.0
         self._shoulder_width_ewma = Ewma(0.5)
 
     def parse_keypoints(self, keypoints: Keypoints) -> ShoulderWidthResult:
-        if keypoints.left_shoulder.conf > 0.8 and keypoints.right_shoulder.conf > 0.8:
+        if keypoints.left_shoulder.conf > self._min_keypoint_conf and keypoints.right_shoulder.conf > self._min_keypoint_conf:
             shoulder_width = float(np.linalg.norm(keypoints.left_shoulder.xy - keypoints.right_shoulder.xy))
             self._shoulder_width = self._shoulder_width_ewma(shoulder_width)
 

@@ -17,7 +17,8 @@ class PointingResult:
 
 
 class Pointing(GestureBase[PointingResult]):
-    def __init__(self, side: Side):
+    def __init__(self, min_keypoint_conf: float, side: Side):
+        self._min_keypoint_conf = min_keypoint_conf
         self._side = side
 
         self._shoulder_width: float = 0.0
@@ -41,11 +42,11 @@ class Pointing(GestureBase[PointingResult]):
             reference_shoulder = keypoints.right_shoulder
             wrist = keypoints.right_wrist
 
-        if reference_shoulder.conf > 0.8:
+        if reference_shoulder.conf > self._min_keypoint_conf:
             self._reference_shoulder_xy = self._reference_shoulder_xy_ewma(reference_shoulder.xy)
 
         detected = False
-        if reference_shoulder.conf > 0.8 and wrist.conf > 0.8 and self._shoulder_width > 0.0:
+        if reference_shoulder.conf > self._min_keypoint_conf and wrist.conf > self._min_keypoint_conf and self._shoulder_width > 0.0:
             xy = (wrist.xy - self._reference_shoulder_xy) / self._shoulder_width
             if self._ratio > 1.0:
                 xy[1] *= self._ratio

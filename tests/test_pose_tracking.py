@@ -3,6 +3,8 @@ import numpy as np
 from pose.tracking import Tracking
 from tests.utils.pose import Pose
 
+MIN_KEYPOINT_CONF = 0.8
+
 
 class TestTracking:
     def test_tracking(self) -> None:
@@ -10,7 +12,7 @@ class TestTracking:
         pose2 = Pose()
         pose3 = Pose()
         track_ids = []
-        tracking = Tracking(4, 4.0)
+        tracking = Tracking(4, MIN_KEYPOINT_CONF, 4.0)
 
         # Person 1 and 3 enter, but nobody raises hand
         track_ids = [1, 2]

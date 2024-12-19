@@ -36,6 +36,10 @@ class PoseModelConfig(BaseModel):
         default=0.8,
         description="minimum required confidence for detecting a person",
     )
+    min_keypoint_conf: float = Field(
+        default=0.8,
+        description="minimum required confidence for detecting a keypoint",
+    )
     tracking_timeout: float = Field(
         default=4.0,
         description="time in seconds until invisible person is unassined",
@@ -100,9 +104,9 @@ class PoseModel:
         else:
             self._model = YOLO(Path(self._config.model_path) / f"{self._config.model}.pt")
 
-        self._tracking = Tracking(max_num_persons, self._config.tracking_timeout)
+        self._tracking = Tracking(max_num_persons, self._config.min_keypoint_conf, self._config.tracking_timeout)
 
-        self.person = [Person() for _ in range(max_num_persons)]
+        self.person = [Person(self._config.min_keypoint_conf) for _ in range(max_num_persons)]
 
     def process_frame(self, frame: MatLike) -> PoseFrameResult:
         results = self._model.track(

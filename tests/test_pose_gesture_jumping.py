@@ -3,11 +3,13 @@ import numpy as np
 from pose.gesture.jumping import Jumping
 from tests.utils.pose import Pose
 
+MIN_KEYPOINT_CONF = 0.8
+
 
 class TestJumping:
     def test_detected(self) -> None:
         pose = Pose()
-        jumping = Jumping()
+        jumping = Jumping(MIN_KEYPOINT_CONF)
         jumping.set_shoulder_width(0.4)
 
         for y in np.linspace(0.7, 0.2, 10):
@@ -19,7 +21,7 @@ class TestJumping:
 
     def test_sensitivity(self) -> None:
         pose = Pose()
-        jumping = Jumping()
+        jumping = Jumping(MIN_KEYPOINT_CONF)
         jumping.set_sensitivity(0.4)
         jumping.set_shoulder_width(0.4)
 
@@ -32,7 +34,7 @@ class TestJumping:
 
     def test_not_detected_no_movement(self) -> None:
         pose = Pose()
-        jumping = Jumping()
+        jumping = Jumping(MIN_KEYPOINT_CONF)
         jumping.set_shoulder_width(0.4)
 
         for _ in range(10):
@@ -42,7 +44,7 @@ class TestJumping:
 
     def test_not_detected_down_movement(self) -> None:
         pose = Pose()
-        jumping = Jumping()
+        jumping = Jumping(MIN_KEYPOINT_CONF)
         jumping.set_shoulder_width(0.4)
 
         for y in np.linspace(0.4, 0.6, 10):
@@ -54,7 +56,7 @@ class TestJumping:
 
     def test_not_detected_keypoint_threshold(self) -> None:
         pose = Pose()
-        jumping = Jumping()
+        jumping = Jumping(MIN_KEYPOINT_CONF)
         jumping.set_shoulder_width(0.4)
 
         for y in np.linspace(0.6, 0.4, 10):

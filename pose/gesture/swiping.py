@@ -18,7 +18,8 @@ class SwipingResult:
 
 
 class Swiping(GestureBase[SwipingResult]):
-    def __init__(self, side: Side):
+    def __init__(self, min_keypoint_conf: float, side: Side):
+        self._min_keypoint_conf = min_keypoint_conf
         self._side = side
 
         self._shoulder_width: float = 0.0
@@ -43,7 +44,7 @@ class Swiping(GestureBase[SwipingResult]):
         else:
             wrist = keypoints.right_wrist
 
-        if wrist.conf > 0.8:
+        if wrist.conf > self._min_keypoint_conf:
             position_diff = self._position_ewma(self._position_diff(wrist.xy))
         else:
             self._position_diff.reset()

@@ -4,11 +4,13 @@ from pose.gesture.arm_raising import ArmRaising
 from tests.utils.pose import Pose
 from utils.side import Side
 
+MIN_KEYPOINT_CONF = 0.8
+
 
 class TestLeftArm:
     def test_detected(self) -> None:
         pose = Pose()
-        arm_raising = ArmRaising(Side.LEFT)
+        arm_raising = ArmRaising(MIN_KEYPOINT_CONF, Side.LEFT)
 
         pose.left_elbow = np.array([0.7, 0.05, 1.0])
         pose.left_wrist = np.array([0.7, 0.00, 1.0])
@@ -18,7 +20,7 @@ class TestLeftArm:
 
     def test_not_detected_pose(self) -> None:
         pose = Pose()
-        arm_raising = ArmRaising(Side.LEFT)
+        arm_raising = ArmRaising(MIN_KEYPOINT_CONF, Side.LEFT)
 
         result = arm_raising.parse_keypoints(pose.keypoints)
 
@@ -26,7 +28,7 @@ class TestLeftArm:
 
     def test_not_detected_keypoint_threshold(self) -> None:
         pose = Pose()
-        arm_raising = ArmRaising(Side.LEFT)
+        arm_raising = ArmRaising(MIN_KEYPOINT_CONF, Side.LEFT)
 
         pose.left_elbow = np.array([0.7, 0.05, 0.5])
         pose.left_wrist = np.array([0.7, 0.00, 0.5])
@@ -38,7 +40,7 @@ class TestLeftArm:
 class TestRightArm:
     def test_detected(self) -> None:
         pose = Pose()
-        arm_raising = ArmRaising(Side.RIGHT)
+        arm_raising = ArmRaising(MIN_KEYPOINT_CONF, Side.RIGHT)
 
         pose.right_elbow = np.array([0.3, 0.05, 1.0])
         pose.right_wrist = np.array([0.3, 0.00, 1.0])
@@ -48,7 +50,7 @@ class TestRightArm:
 
     def test_not_detected_pose(self) -> None:
         pose = Pose()
-        arm_raising = ArmRaising(Side.RIGHT)
+        arm_raising = ArmRaising(MIN_KEYPOINT_CONF, Side.RIGHT)
 
         result = arm_raising.parse_keypoints(pose.keypoints)
 
@@ -56,7 +58,7 @@ class TestRightArm:
 
     def test_not_detected_keypoint_threshold(self) -> None:
         pose = Pose()
-        arm_raising = ArmRaising(Side.RIGHT)
+        arm_raising = ArmRaising(MIN_KEYPOINT_CONF, Side.RIGHT)
 
         pose.right_elbow = np.array([0.3, 0.05, 0.5])
         pose.right_wrist = np.array([0.3, 0.00, 0.5])

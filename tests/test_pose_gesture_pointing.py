@@ -4,11 +4,13 @@ from pose.gesture.pointing import Pointing
 from tests.utils.pose import Pose
 from utils.side import Side
 
+MIN_KEYPOINT_CONF = 0.8
+
 
 class TestLeftHand:
     def test_detected(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.LEFT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.LEFT)
         pointing.set_shoulder_width(0.4)
 
         result = pointing.parse_keypoints(pose.keypoints)
@@ -17,7 +19,7 @@ class TestLeftHand:
 
     def test_center(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.LEFT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.LEFT)
         pointing.set_shoulder_width(0.4)
 
         pose.left_wrist = pose.left_shoulder
@@ -28,7 +30,7 @@ class TestLeftHand:
 
     def test_top_left(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.LEFT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.LEFT)
         pointing.set_shoulder_width(0.4)
 
         pose.left_wrist = pose.left_shoulder + np.array([-0.4, -0.4 / 16 * 9, 0.0])
@@ -39,7 +41,7 @@ class TestLeftHand:
 
     def test_bottom_right(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.LEFT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.LEFT)
         pointing.set_shoulder_width(0.4)
 
         pose.left_wrist = pose.left_shoulder + np.array([0.4, 0.4 / 16 * 9, 0.0])
@@ -50,7 +52,7 @@ class TestLeftHand:
 
     def test_top_left_portrait(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.LEFT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.LEFT)
         pointing.set_aspect_ratio((9, 16))
         pointing.set_shoulder_width(0.4)
 
@@ -62,7 +64,7 @@ class TestLeftHand:
 
     def test_bottom_right_portrait(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.LEFT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.LEFT)
         pointing.set_aspect_ratio((9, 16))
         pointing.set_shoulder_width(0.4)
 
@@ -74,7 +76,7 @@ class TestLeftHand:
 
     def test_not_detected_outside(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.LEFT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.LEFT)
         pointing.set_shoulder_width(0.4)
 
         pose.left_wrist = pose.left_shoulder + np.array([-0.5, -0.5 / 16 * 9, 0.0])
@@ -84,7 +86,7 @@ class TestLeftHand:
 
     def test_not_detected_keypoint_threshold(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.LEFT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.LEFT)
         pointing.set_shoulder_width(0.4)
 
         pose.left_wrist = np.array([pose.left_shoulder[0], pose.left_shoulder[1], 0.5])
@@ -94,7 +96,7 @@ class TestLeftHand:
 
     def test_not_detected_shoulder_width_zero(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.LEFT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.LEFT)
         pointing.set_shoulder_width(0.0)
 
         result = pointing.parse_keypoints(pose.keypoints)
@@ -105,7 +107,7 @@ class TestLeftHand:
 class TestRightHand:
     def test_detected(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.RIGHT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.RIGHT)
         pointing.set_shoulder_width(0.4)
 
         result = pointing.parse_keypoints(pose.keypoints)
@@ -114,7 +116,7 @@ class TestRightHand:
 
     def test_center(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.RIGHT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.RIGHT)
         pointing.set_shoulder_width(0.4)
 
         pose.right_wrist = pose.right_shoulder
@@ -125,7 +127,7 @@ class TestRightHand:
 
     def test_top_left(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.RIGHT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.RIGHT)
         pointing.set_shoulder_width(0.4)
 
         pose.right_wrist = pose.right_shoulder + np.array([-0.4, -0.4 / 16 * 9, 0.0])
@@ -136,7 +138,7 @@ class TestRightHand:
 
     def test_bottom_right(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.RIGHT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.RIGHT)
         pointing.set_shoulder_width(0.4)
 
         pose.right_wrist = pose.right_shoulder + np.array([0.4, 0.4 / 16 * 9, 0.0])
@@ -147,7 +149,7 @@ class TestRightHand:
 
     def test_top_left_portrait(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.RIGHT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.RIGHT)
         pointing.set_aspect_ratio((9, 16))
         pointing.set_shoulder_width(0.4)
 
@@ -159,7 +161,7 @@ class TestRightHand:
 
     def test_bottom_right_portrait(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.RIGHT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.RIGHT)
         pointing.set_aspect_ratio((9, 16))
         pointing.set_shoulder_width(0.4)
 
@@ -171,7 +173,7 @@ class TestRightHand:
 
     def test_not_detected_outside(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.RIGHT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.RIGHT)
         pointing.set_shoulder_width(0.4)
 
         pose.right_wrist = pose.right_shoulder + np.array([-0.5, -0.5 / 16 * 9, 0.0])
@@ -181,7 +183,7 @@ class TestRightHand:
 
     def test_not_detected_keypoint_threshold(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.RIGHT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.RIGHT)
         pointing.set_shoulder_width(0.4)
 
         pose.right_wrist = np.array([pose.right_shoulder[0], pose.right_shoulder[1], 0.5])
@@ -191,7 +193,7 @@ class TestRightHand:
 
     def test_not_detected_shoulder_width_zero(self) -> None:
         pose = Pose()
-        pointing = Pointing(Side.RIGHT)
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.RIGHT)
         pointing.set_shoulder_width(0.0)
 
         result = pointing.parse_keypoints(pose.keypoints)

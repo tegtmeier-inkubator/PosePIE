@@ -8,9 +8,10 @@ from pose.person import Person
 
 
 class Tracking:
-    def __init__(self, max_num_persons: int, tracking_timeout: float) -> None:
+    def __init__(self, max_num_persons: int, min_keypoint_conf: float, tracking_timeout: float) -> None:
         assert max_num_persons >= 1
         self._max_num_persons = max_num_persons
+        self._min_keypoint_conf = min_keypoint_conf
         self._tracking_timeout = tracking_timeout
 
         self._track_last_seen: dict[int, float] = {}
@@ -48,7 +49,7 @@ class Tracking:
         for track_id in unassigned_track_ids.copy():
             idx = track_ids.index(track_id)
 
-            person = Person()
+            person = Person(self._min_keypoint_conf)
             person.parse_keypoints(keypoints[idx], keypoints_scores[idx])
 
             if person.right_arm_raising.detected:

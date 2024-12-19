@@ -14,14 +14,16 @@ class SteeringResult:
 
 
 class Steering(GestureBase[SteeringResult]):
-    def __init__(self) -> None:
+    def __init__(self, min_keypoint_conf: float) -> None:
+        self._min_keypoint_conf = min_keypoint_conf
+
         self._shoulder_width: float = 0.0
 
     def set_shoulder_width(self, shoulder_width: float) -> None:
         self._shoulder_width = shoulder_width
 
     def parse_keypoints(self, keypoints: Keypoints) -> SteeringResult:
-        if keypoints.left_wrist.conf > 0.8 and keypoints.right_wrist.conf > 0.8:
+        if keypoints.left_wrist.conf > self._min_keypoint_conf and keypoints.right_wrist.conf > self._min_keypoint_conf:
             steering_vector = Vector2(keypoints.left_wrist.xy - keypoints.right_wrist.xy)
 
             detected = float(np.linalg.norm(steering_vector.xy)) < self._shoulder_width * 1.5

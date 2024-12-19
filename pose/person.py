@@ -17,21 +17,21 @@ T = TypeVar("T")
 
 
 class Person:
-    def __init__(self) -> None:
+    def __init__(self, min_keypoint_conf: float) -> None:
         self.keypoints = Keypoints()
 
         self.cache: dict[Callable[..., Any], Any] = {}
 
-        self._left_arm_raising = ArmRaising(Side.LEFT)
-        self._right_arm_raising = ArmRaising(Side.RIGHT)
-        self._jumping = Jumping()
-        self._leaning = Leaning()
-        self._left_hand_pointing = Pointing(Side.LEFT)
-        self._right_hand_pointing = Pointing(Side.RIGHT)
-        self._shoulder_width = ShoulderWidth()
-        self._steering = Steering()
-        self._left_hand_swiping = Swiping(Side.LEFT)
-        self._right_hand_swiping = Swiping(Side.RIGHT)
+        self._left_arm_raising = ArmRaising(min_keypoint_conf, Side.LEFT)
+        self._right_arm_raising = ArmRaising(min_keypoint_conf, Side.RIGHT)
+        self._jumping = Jumping(min_keypoint_conf)
+        self._leaning = Leaning(min_keypoint_conf)
+        self._left_hand_pointing = Pointing(min_keypoint_conf, Side.LEFT)
+        self._right_hand_pointing = Pointing(min_keypoint_conf, Side.RIGHT)
+        self._shoulder_width = ShoulderWidth(min_keypoint_conf)
+        self._steering = Steering(min_keypoint_conf)
+        self._left_hand_swiping = Swiping(min_keypoint_conf, Side.LEFT)
+        self._right_hand_swiping = Swiping(min_keypoint_conf, Side.RIGHT)
 
     def parse_keypoints(
         self,

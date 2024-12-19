@@ -11,7 +11,8 @@ class ArmRaisingResult:
 
 
 class ArmRaising(GestureBase[ArmRaisingResult]):
-    def __init__(self, side: Side):
+    def __init__(self, min_keypoint_conf: float, side: Side):
+        self._min_keypoint_conf = min_keypoint_conf
         self._side = side
 
     def parse_keypoints(self, keypoints: Keypoints) -> ArmRaisingResult:
@@ -22,6 +23,6 @@ class ArmRaising(GestureBase[ArmRaisingResult]):
             eye = keypoints.right_eye
             elbow = keypoints.right_elbow
 
-        detected = elbow.conf > 0.8 and eye.conf > 0.8 and elbow.y < eye.y
+        detected = elbow.conf > self._min_keypoint_conf and eye.conf > self._min_keypoint_conf and elbow.y < eye.y
 
         return ArmRaisingResult(detected)

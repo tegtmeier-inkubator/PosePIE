@@ -3,11 +3,13 @@ import numpy as np
 from pose.gesture.steering import Steering
 from tests.utils.pose import Pose
 
+MIN_KEYPOINT_CONF = 0.8
+
 
 class TestSteering:
     def test_zero_degrees(self) -> None:
         pose = Pose()
-        steering = Steering()
+        steering = Steering(MIN_KEYPOINT_CONF)
         steering.set_shoulder_width(0.4)
 
         pose.left_wrist = np.array([0.6, 0.5, 1.0])
@@ -19,7 +21,7 @@ class TestSteering:
 
     def test_plus_45_degrees(self) -> None:
         pose = Pose()
-        steering = Steering()
+        steering = Steering(MIN_KEYPOINT_CONF)
         steering.set_shoulder_width(0.4)
 
         pose.left_wrist = np.array([0.6, 0.4, 1.0])
@@ -31,7 +33,7 @@ class TestSteering:
 
     def test_plus_90_degrees(self) -> None:
         pose = Pose()
-        steering = Steering()
+        steering = Steering(MIN_KEYPOINT_CONF)
         steering.set_shoulder_width(0.4)
 
         pose.left_wrist = np.array([0.5, 0.4, 1.0])
@@ -43,7 +45,7 @@ class TestSteering:
 
     def test_minus_45_degrees(self) -> None:
         pose = Pose()
-        steering = Steering()
+        steering = Steering(MIN_KEYPOINT_CONF)
         steering.set_shoulder_width(0.4)
 
         pose.left_wrist = np.array([0.6, 0.6, 1.0])
@@ -55,7 +57,7 @@ class TestSteering:
 
     def test_minus_90_degrees(self) -> None:
         pose = Pose()
-        steering = Steering()
+        steering = Steering(MIN_KEYPOINT_CONF)
         steering.set_shoulder_width(0.4)
 
         pose.left_wrist = np.array([0.5, 0.6, 1.0])
@@ -67,7 +69,7 @@ class TestSteering:
 
     def test_not_detected_keypoint_threshold(self) -> None:
         pose = Pose()
-        steering = Steering()
+        steering = Steering(MIN_KEYPOINT_CONF)
         steering.set_shoulder_width(0.4)
 
         pose.left_wrist = np.array([0.6, 0.5, 0.5])
@@ -79,7 +81,7 @@ class TestSteering:
 
     def test_not_detected_distance(self) -> None:
         pose = Pose()
-        steering = Steering()
+        steering = Steering(MIN_KEYPOINT_CONF)
         steering.set_shoulder_width(0.4)
 
         pose.left_wrist = np.array([0.8, 0.5, 1.0])

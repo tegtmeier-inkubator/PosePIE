@@ -4,11 +4,13 @@ from pose.gesture.swiping import Swiping
 from tests.utils.pose import Pose
 from utils.side import Side
 
+MIN_KEYPOINT_CONF = 0.8
+
 
 class TestLeftHand:
     def test_left_hand_up(self) -> None:
         pose = Pose()
-        swiping = Swiping(Side.LEFT)
+        swiping = Swiping(MIN_KEYPOINT_CONF, Side.LEFT)
         swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
@@ -23,7 +25,7 @@ class TestLeftHand:
 
     def test_left_hand_down(self) -> None:
         pose = Pose()
-        swiping = Swiping(Side.LEFT)
+        swiping = Swiping(MIN_KEYPOINT_CONF, Side.LEFT)
         swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
@@ -38,7 +40,7 @@ class TestLeftHand:
 
     def test_left_hand_left(self) -> None:
         pose = Pose()
-        swiping = Swiping(Side.LEFT)
+        swiping = Swiping(MIN_KEYPOINT_CONF, Side.LEFT)
         swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
@@ -53,7 +55,7 @@ class TestLeftHand:
 
     def test_left_hand_right(self) -> None:
         pose = Pose()
-        swiping = Swiping(Side.LEFT)
+        swiping = Swiping(MIN_KEYPOINT_CONF, Side.LEFT)
         swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
@@ -68,7 +70,7 @@ class TestLeftHand:
 
     def test_left_not_detected_no_movement(self) -> None:
         pose = Pose()
-        swiping = Swiping(Side.LEFT)
+        swiping = Swiping(MIN_KEYPOINT_CONF, Side.LEFT)
         swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
@@ -82,7 +84,7 @@ class TestLeftHand:
 
     def test_left_not_detected_keypoint_threshold(self) -> None:
         pose = Pose()
-        swiping = Swiping(Side.LEFT)
+        swiping = Swiping(MIN_KEYPOINT_CONF, Side.LEFT)
         swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
@@ -99,7 +101,7 @@ class TestLeftHand:
 class TestRightHand:
     def test_right_hand_up(self) -> None:
         pose = Pose()
-        swiping = Swiping(Side.RIGHT)
+        swiping = Swiping(MIN_KEYPOINT_CONF, Side.RIGHT)
         swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
@@ -114,7 +116,7 @@ class TestRightHand:
 
     def test_right_hand_down(self) -> None:
         pose = Pose()
-        swiping = Swiping(Side.RIGHT)
+        swiping = Swiping(MIN_KEYPOINT_CONF, Side.RIGHT)
         swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
@@ -129,7 +131,7 @@ class TestRightHand:
 
     def test_right_hand_left(self) -> None:
         pose = Pose()
-        swiping = Swiping(Side.RIGHT)
+        swiping = Swiping(MIN_KEYPOINT_CONF, Side.RIGHT)
         swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
@@ -144,7 +146,7 @@ class TestRightHand:
 
     def test_right_hand_right(self) -> None:
         pose = Pose()
-        swiping = Swiping(Side.RIGHT)
+        swiping = Swiping(MIN_KEYPOINT_CONF, Side.RIGHT)
         swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
@@ -159,7 +161,7 @@ class TestRightHand:
 
     def test_right_not_detected_no_movement(self) -> None:
         pose = Pose()
-        swiping = Swiping(Side.RIGHT)
+        swiping = Swiping(MIN_KEYPOINT_CONF, Side.RIGHT)
         swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
@@ -173,7 +175,7 @@ class TestRightHand:
 
     def test_right_not_detected_keypoint_threshold(self) -> None:
         pose = Pose()
-        swiping = Swiping(Side.RIGHT)
+        swiping = Swiping(MIN_KEYPOINT_CONF, Side.RIGHT)
         swiping.set_sensitivity(0.16)
         swiping.set_shoulder_width(0.4)
 
