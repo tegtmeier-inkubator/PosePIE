@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
+# Copyright (c) 2024, 2025 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
 #
 # This file is part of PosePIE.
 #
@@ -23,7 +23,11 @@ import numpy.typing as npt
 
 
 class Derivative:
-    """
+    """Derivative filter
+
+    Computes the time derivative between the last and the current value.
+    The class stores the last value internally, so a separate instance has to be used for each use of the filter.
+
     >>> derivative = Derivative()
     >>> derivative(1.0, timestamp = 0.0)
     0.0
@@ -64,8 +68,14 @@ class Derivative:
 
 
 class Ewma:
-    """
-    >>> ewma = Ewma()
+    """Exponentially Weighted Moving Average (EWMA) filter
+
+    Performs low pass filtering of a value.
+    The class stores the smoothed value internally, so a separate instance has to be used for each use of the filter.
+
+    :param time_constant: time in seconds after which the smoothed signal of a unit step function reaches 1-1/e = 63.2%.
+
+    >>> ewma = Ewma(time_constant = 1.0)
     >>> ewma(0.0, timestamp = 0.0)
     0.0
     >>> ewma(1.0, timestamp = 0.0)
@@ -107,7 +117,11 @@ class Ewma:
 
 
 class RisingEdge:
-    """
+    """Rising edge filter
+
+    Returns True if the input value switched from False to True and False otherwise.
+    The class stores the last value internally, so a separate instance has to be used for each use of the filter.
+
     >>> rising_edge = RisingEdge()
     >>> rising_edge(True)
     False
@@ -127,7 +141,11 @@ class RisingEdge:
 
 
 class FallingEdge:
-    """
+    """Falling edge filter
+
+    Returns True if the input value switched from True to False and False otherwise.
+    The class stores the last value internally, so a separate instance has to be used for each use of the filter.
+
     >>> falling_edge = FallingEdge()
     >>> falling_edge(False)
     False
@@ -147,8 +165,15 @@ class FallingEdge:
 
 
 class Turbo:
-    """
-    >>> turbo = Turbo(1.0)
+    """Turbo fire filter
+
+    Returns True for a single call at a configurable interval as long as the input value is True.
+    It always returns True when the input value became True and False if the input value is False.
+    The class stores the state and a timer internally, so a separate instance has to be used for each use of the filter.
+
+    :param interval: Interval in seconds in which the function returns single instances of True.
+
+    >>> turbo = Turbo(interval = 1.0)
     >>> turbo(True, timestamp=0.0)
     True
     >>> turbo(True, timestamp=0.5)
