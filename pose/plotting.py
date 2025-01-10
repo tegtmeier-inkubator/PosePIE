@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
+# Copyright (c) 2024, 2025 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
 #
 # This file is part of PosePIE.
 #
@@ -33,7 +33,7 @@ def get_player_color(player_id: int) -> tuple[int, int, int]:
     return PLAYER_COLORS[player_id % len(PLAYER_COLORS)]
 
 
-def _annotate_persons(frame: MatLike, pose_result: PoseFrameResult) -> None:
+def _annotate_persons(frame: MatLike, pose_result: PoseFrameResult, min_keypoint_conf: float) -> None:
     player_ids = (
         {player.track_id: player_id for player_id, player in enumerate(pose_result.stats.player_stats)}
         if pose_result.stats.player_stats is not None
@@ -48,7 +48,7 @@ def _annotate_persons(frame: MatLike, pose_result: PoseFrameResult) -> None:
         track_id = int(bbox.id)
 
         if track_id in player_ids:
-            annotator.kpts(keypoints.data[0])
+            annotator.kpts(keypoints.data[0], conf_thres=min_keypoint_conf)
             annotator.box_label(
                 bbox.xyxy.squeeze(),
                 f"Player {player_ids[track_id] + 1}",
@@ -112,7 +112,7 @@ def _add_inference_stats(frame: MatLike, pose_result: PoseFrameResult) -> None:
     )
 
 
-def annotate_frame(frame: MatLike, pose_result: PoseFrameResult, max_num_players: int) -> None:
-    _annotate_persons(frame, pose_result)
+def annotate_frame(frame: MatLike, pose_result: PoseFrameResult, min_keypoint_conf: float, max_num_players: int) -> None:
+    _annotate_persons(frame, pose_result, min_keypoint_conf)
     _draw_footer(frame, pose_result, max_num_players)
     _add_inference_stats(frame, pose_result)

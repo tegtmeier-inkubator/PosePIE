@@ -106,7 +106,7 @@ class ScriptBase(ABC):
                     plugin.post_update()
 
                 if self._config.show_camera:
-                    annotate_frame(frame, pose_result, self.max_num_players)
+                    annotate_frame(frame, pose_result, self._config.pose.min_keypoint_conf, self.max_num_players)
                     cv2.imshow(CV2_WINDOW_TITLE, frame)
 
                     if cv2.waitKey(1) & 0xFF == ord("q") or not cv2.getWindowProperty(CV2_WINDOW_TITLE, cv2.WND_PROP_VISIBLE):
