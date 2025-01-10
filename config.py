@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
+# Copyright (c) 2024, 2025 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
 #
 # This file is part of PosePIE.
 #
@@ -31,4 +31,6 @@ class Config(BaseSettings, cli_parse_args=True, cli_hide_none_type=True):
         description="show window with annotated camera image",
     )
 
-    script: CliPositionalArg[str]
+    script: CliPositionalArg[str] = Field(
+        description="path to the user script",
+    )
