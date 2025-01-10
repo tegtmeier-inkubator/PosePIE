@@ -49,14 +49,19 @@ class PoseModelConfig(BaseModel):
     )
     min_bbox_conf: float = Field(
         default=0.8,
+        ge=0.0,
+        le=1.0,
         description="minimum required confidence for detecting a person",
     )
     min_keypoint_conf: float = Field(
         default=0.8,
+        ge=0.0,
+        le=1.0,
         description="minimum required confidence for detecting a keypoint",
     )
     tracking_timeout: float = Field(
         default=4.0,
+        ge=0.0,
         description="time in seconds until invisible person is unassined",
     )
 
