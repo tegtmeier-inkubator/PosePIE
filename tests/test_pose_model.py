@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
+# Copyright (c) 2024, 2025 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
 #
 # This file is part of PosePIE.
 #
@@ -14,7 +14,7 @@
 # not, see <https://www.gnu.org/licenses/>.
 
 import numpy as np
-from pose.model import correct_aspect_ratio
+from pose.model import correct_aspect_ratio, filter_keypoints_at_edge
 
 
 class TestCorrectAspectRatio:
@@ -35,3 +35,12 @@ class TestCorrectAspectRatio:
         )
         np.testing.assert_equal(bboxes, [[0.21875, 0.0, 0.78125, 1.0]])
         np.testing.assert_equal(keypoints, [[[0.21875, 0.0, 0.5], [0.78125, 1.0, 0.5], [0.5, 0.5, 0.5]]])
+
+
+class TestFilterKeypointsAtEdge:
+    def test_filter(self) -> None:
+        keypoints_scores = filter_keypoints_at_edge(
+            np.array([[[0.5, 0.5], [0.0, 0.5], [0.5, 0.0], [1.0, 0.5], [0.5, 1.0]]]),
+            np.array([[[0.5], [0.5], [0.5], [0.5], [0.5]]]),
+        )
+        np.testing.assert_equal(keypoints_scores, [[[0.5], [0.0], [0.0], [0.0], [0.0]]])

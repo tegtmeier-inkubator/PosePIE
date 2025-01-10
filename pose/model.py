@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
+# Copyright (c) 2024, 2025 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
 #
 # This file is part of PosePIE.
 #
@@ -101,6 +101,19 @@ def correct_aspect_ratio(
     return bboxes, keypoints
 
 
+def filter_keypoints_at_edge(
+    keypoints: npt.NDArray[np.float64],
+    keypoints_scores: npt.NDArray[np.float64],
+) -> npt.NDArray[np.float64]:
+    keypoints_x_at_edge = keypoints[..., 0] % 1.0 == 0.0
+    keypoints_y_at_edge = keypoints[..., 1] % 1.0 == 0.0
+    keypoints_at_edge = keypoints_x_at_edge | keypoints_y_at_edge
+
+    keypoints_scores[keypoints_at_edge] = 0.0
+
+    return keypoints_scores
+
+
 class PoseModel:
     def __init__(
         self,
@@ -143,6 +156,7 @@ class PoseModel:
             keypoints = result.keypoints.xyn.cpu().numpy()
             keypoints_scores = result.keypoints.conf.cpu().numpy()
 
+            keypoints_scores = filter_keypoints_at_edge(keypoints, keypoints_scores)
             bboxes, keypoints = correct_aspect_ratio(frame_shape, bboxes, keypoints)
         else:
             bboxes = np.empty((0, 4))
