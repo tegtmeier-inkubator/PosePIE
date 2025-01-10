@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
+# Copyright (c) 2024, 2025 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
 #
 # This file is part of PosePIE.
 #
@@ -39,7 +39,13 @@ class ScriptBase(ABC):
         max_num_players: int = 4,
     ) -> None:
         self._config = config
+
         self.max_num_players = max_num_players
+        """Maximum number of players
+
+        Has to be set in the `setup()` method in the user script to define the maximum number of players that are handled by the program.
+        Can be used in the `update()` method for a loop like `for player_id in range(self.max_num_players):` to iterate over all players.
+        """
 
         self._plugins: list[PluginBase] = []
 
@@ -48,21 +54,35 @@ class ScriptBase(ABC):
         self.pose = PoseModel(self._config.pose, self.max_num_players)
 
     def add_gamepad(self) -> Gamepad:
+        """Adds a virtual gamepad for input emulation"""
         gamepad = Gamepad()
         self._plugins.append(GamepadPlugin(gamepad))
         return gamepad
 
     def add_keyboard(self) -> Keyboard:
+        """Adds a virtual keyboard for input emulation"""
         keyboard = Keyboard()
         self._plugins.append(KeyboardPlugin(keyboard))
         return keyboard
 
     def add_mouse(self, absolute: bool = False) -> Mouse:
+        """Adds a virtual mouse for input emulation
+
+        The mouse can operate in two modes.
+        In relative mode, the mouse can be moved relative to its current position via the `move_relative` member.
+        In absolute mode, the mouse can be moved absolute to normalized screen coordinates via the `move_absolute` member.
+
+        :param absolute: whether absolute mode should be used
+        """
         mouse = Mouse(absolute)
         self._plugins.append(MousePlugin(mouse))
         return mouse
 
     def run(self) -> None:
+        """Main loop of the program
+
+        This function should never be called in the user script.
+        """
         camera = Camera(self._config.camera)
         print(f"Opened camera with {camera.width}x{camera.height}@{camera.fps} ({camera.format_fourcc})")
 
@@ -102,8 +122,18 @@ class ScriptBase(ABC):
 
     @abstractmethod
     def setup(self) -> None:
+        """Setup of the user script
+
+        This method is called once when the program starts and should define variables and set up the required emulated input devices.
+        Here, `self.max_num_players` should be set to the maximum number of players.
+        """
         raise NotImplementedError
 
     @abstractmethod
     def update(self) -> None:
+        """Update of the user script
+
+        This method is executed at every frame and should contain the main mapping logic.
+        The logic has to handle each player separately, which can be simplified by using a for loop up to the maximum number of players.
+        """
         raise NotImplementedError
