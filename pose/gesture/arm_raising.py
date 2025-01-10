@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
+# Copyright (c) 2024, 2025 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
 #
 # This file is part of PosePIE.
 #
@@ -33,11 +33,11 @@ class ArmRaising(GestureBase[ArmRaisingResult]):
     def parse_keypoints(self, keypoints: Keypoints) -> ArmRaisingResult:
         if self._side is Side.LEFT:
             eye = keypoints.left_eye
-            elbow = keypoints.left_elbow
+            wrist = keypoints.left_wrist
         else:
             eye = keypoints.right_eye
-            elbow = keypoints.right_elbow
+            wrist = keypoints.right_wrist
 
-        detected = elbow.conf > self._min_keypoint_conf and eye.conf > self._min_keypoint_conf and elbow.y < eye.y
+        detected = wrist.conf > self._min_keypoint_conf and eye.conf > self._min_keypoint_conf and wrist.y < eye.y
 
         return ArmRaisingResult(detected)
