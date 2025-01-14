@@ -26,6 +26,8 @@ class ArmRaisingResult:
 
 
 class ArmRaising(GestureBase[ArmRaisingResult]):
+    """Detects if the arm is raised."""
+
     def __init__(self, min_keypoint_conf: float, side: Side):
         self._min_keypoint_conf = min_keypoint_conf
         self._side = side

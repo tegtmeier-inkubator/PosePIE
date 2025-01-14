@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
+# Copyright (c) 2024, 2025 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
 #
 # This file is part of PosePIE.
 #
@@ -32,6 +32,8 @@ class JumpingResult:
 
 
 class Jumping(GestureBase[JumpingResult]):
+    """Detects jumping."""
+
     def __init__(self, min_keypoint_conf: float) -> None:
         self._min_keypoint_conf = min_keypoint_conf
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
+# Copyright (c) 2024, 2025 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
 #
 # This file is part of PosePIE.
 #
@@ -37,6 +37,8 @@ class PointingResult:
 
 
 class Pointing(GestureBase[PointingResult]):
+    """Calculates the relative hand position to replace a mouse."""
+
     def __init__(self, min_keypoint_conf: float, side: Side):
         self._min_keypoint_conf = min_keypoint_conf
         self._side = side
