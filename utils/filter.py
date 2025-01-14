@@ -56,7 +56,11 @@ class Derivative:
             diff = (
                 (value - self._old_value) / (timestamp - self._old_timestamp)
                 if not np.isclose(time_diff, 0.0)
-                else np.full_like(value, np.inf) if isinstance(value, np.ndarray) else np.inf
+                else (
+                    (np.full_like(value, np.inf) if isinstance(value, np.ndarray) else np.inf)
+                    if np.any(value - self._old_value)
+                    else (np.zeros_like(value) if isinstance(value, np.ndarray) else 0.0)
+                )
             )
         else:
             diff = np.zeros_like(value) if isinstance(value, np.ndarray) else 0.0

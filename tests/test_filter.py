@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
+# Copyright (c) 2024, 2025 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
 #
 # This file is part of PosePIE.
 #
@@ -116,6 +116,7 @@ class TestDerivative:
         derivative = Derivative()
 
         np.testing.assert_approx_equal(derivative(np.array([1.0]), timestamp=0.0), 0.0)
+        assert derivative(np.array([1.0]), timestamp=0.0) == 0.0
         assert np.isinf(derivative(np.array([2.0]), timestamp=0.0))
 
     def test_without_timestamp(self) -> None:
