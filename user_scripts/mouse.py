@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
+# Copyright (c) 2024, 2025 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
 #
 # This file is part of PosePIE.
 #
@@ -30,3 +30,5 @@ class Mouse(ScriptBase):
 
             self.mouse.move_absolute.x = 1.0 - xy[0]
             self.mouse.move_absolute.y = xy[1]
+
+        self.mouse.button_left = pointing.selecting
