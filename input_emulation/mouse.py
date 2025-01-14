@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
+# Copyright (c) 2024, 2025 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
 #
 # This file is part of PosePIE.
 #
@@ -18,8 +18,6 @@ from sys import platform
 
 import numpy as np
 
-ABS_MAX = 65535
-
 
 @dataclass
 class _Movement:
@@ -29,6 +27,8 @@ class _Movement:
 
 if platform == "linux":
     import uinput
+
+    ABS_MAX = 65535
 
     class Mouse:
         def __init__(self, absolute: bool = False) -> None:
@@ -66,6 +66,55 @@ if platform == "linux":
             self._device.emit(uinput.BTN_RIGHT, int(self.button_right), syn=False)
 
             self._device.syn()
+
+elif platform == "win32":
+    import copy
+
+    import win32api
+    import win32con
+
+    ABS_MAX = 65535
+
+    class Mouse:  # type: ignore[no-redef]
+        def __init__(self, absolute: bool = False) -> None:
+            self._absolute = absolute
+
+            if self._absolute:
+                self.move_absolute = _Movement()
+                self._move_absolute_old = copy.copy(self.move_absolute)
+            else:
+                self.move_relative = _Movement()
+
+            self.button_left: bool = False
+            self._button_left_old = self.button_left
+            self.button_right: bool = False
+            self._button_right_old = self.button_right
+
+        def update(self) -> None:
+            flags: int = 0
+
+            if self.button_left != self._button_left_old:
+                flags |= win32con.MOUSEEVENTF_LEFTDOWN if self.button_left else win32con.MOUSEEVENTF_LEFTUP
+                self._button_left_old = self.button_left
+            if self.button_right != self._button_right_old:
+                flags |= win32con.MOUSEEVENTF_RIGHTDOWN if self.button_left else win32con.MOUSEEVENTF_RIGHTUP
+                self._button_right_old = self.button_right
+
+            if self._absolute:
+                if self.move_absolute != self._move_absolute_old:
+                    win32api.mouse_event(
+                        win32con.MOUSEEVENTF_MOVE | win32con.MOUSEEVENTF_ABSOLUTE | flags,
+                        int(np.clip(int(self.move_absolute.x * ABS_MAX), 0, ABS_MAX)),
+                        int(np.clip(int(self.move_absolute.y * ABS_MAX), 0, ABS_MAX)),
+                    )
+
+                self._move_absolute_old = copy.copy(self.move_absolute)
+            else:
+                win32api.mouse_event(
+                    win32con.MOUSEEVENTF_MOVE | flags,
+                    int(self.move_relative.x),
+                    int(self.move_relative.y),
+                )
 
 else:
 

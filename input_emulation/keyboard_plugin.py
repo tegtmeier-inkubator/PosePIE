@@ -25,7 +25,7 @@ class KeyboardPlugin(PluginBase):
         pass
 
     def pre_update(self) -> None:
-        pass
+        self._keyboard.reset()
 
     def post_update(self) -> None:
         self._keyboard.update()

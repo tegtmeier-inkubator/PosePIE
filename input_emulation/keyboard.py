@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
+# Copyright (c) 2024, 2025 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
 #
 # This file is part of PosePIE.
 #
@@ -272,6 +272,9 @@ if platform == "linux":
 
             self._device = uinput.Device(events)
 
+        def reset(self) -> None:
+            pass
+
         def update(self) -> None:
             self._device.emit(uinput.KEY_UP, int(self.arrow_up), syn=False)
             self._device.emit(uinput.KEY_DOWN, int(self.arrow_down), syn=False)
@@ -386,6 +389,259 @@ if platform == "linux":
             self._device.emit(uinput.KEY_KPENTER, int(self.numpad_enter), syn=False)
 
             self._device.syn()
+
+elif platform == "win32":
+    from typing import Generator
+
+    import win32api
+    import win32con
+
+    KEYBOARD_SCANCODES: dict[str, int] = {
+        "arrow_up": 0x26,
+        "arrow_down": 0x28,
+        "arrow_left": 0x25,
+        "arrow_right": 0x27,
+        #
+        "enter": 0x0D,
+        "backspace": 0x08,
+        "esc": 0x1B,
+        "space": 0x20,
+        "ctrl_left": 0xA2,
+        "ctrl_right": 0xA3,
+        "alt_left": 0xA4,
+        "alt_right": 0xA5,
+        "shift_left": 0xA0,
+        "shift_right": 0xA1,
+        "meta_left": 0x5B,
+        "meta_right": 0x5C,
+        "menu": 0x5D,
+        "caps_lock": 0x14,
+        "tab": 0x09,
+        #
+        "print_screen": 0x2C,
+        "scroll_lock": 0x91,
+        "pause": 0x13,
+        "insert": 0x2D,
+        "home": 0x24,
+        "page_up": 0x21,
+        "delete": 0x2E,
+        "end": 0x23,
+        "page_down": 0x22,
+        #
+        "key_a": 0x41,
+        "key_b": 0x42,
+        "key_c": 0x43,
+        "key_d": 0x44,
+        "key_e": 0x45,
+        "key_f": 0x46,
+        "key_g": 0x47,
+        "key_h": 0x48,
+        "key_i": 0x49,
+        "key_j": 0x4A,
+        "key_k": 0x4B,
+        "key_l": 0x4C,
+        "key_m": 0x4D,
+        "key_n": 0x4E,
+        "key_o": 0x4F,
+        "key_p": 0x50,
+        "key_q": 0x51,
+        "key_r": 0x52,
+        "key_s": 0x53,
+        "key_t": 0x54,
+        "key_u": 0x55,
+        "key_v": 0x56,
+        "key_w": 0x57,
+        "key_x": 0x58,
+        "key_y": 0x59,
+        "key_z": 0x5A,
+        #
+        "num_0": 0x30,
+        "num_1": 0x31,
+        "num_2": 0x32,
+        "num_3": 0x33,
+        "num_4": 0x34,
+        "num_5": 0x35,
+        "num_6": 0x36,
+        "num_7": 0x37,
+        "num_8": 0x38,
+        "num_9": 0x39,
+        #
+        "backtick": 0xC0,
+        "minus": 0xBD,
+        "equals": 0xBB,
+        "backslash": 0xDC,
+        "left_bracket": 0xDB,
+        "right_bracket": 0xDD,
+        "semicolon": 0xBA,
+        "apostrophe": 0xDE,
+        "comma": 0xBC,
+        "dot": 0xBE,
+        "slash": 0xBF,
+        #
+        "f1": 0x70,
+        "f2": 0x71,
+        "f3": 0x72,
+        "f4": 0x73,
+        "f5": 0x74,
+        "f6": 0x75,
+        "f7": 0x76,
+        "f8": 0x77,
+        "f9": 0x78,
+        "f10": 0x79,
+        "f11": 0x7A,
+        "f12": 0x7B,
+        #
+        "numpad_lock": 0x90,
+        "numpad_0": 0x60,
+        "numpad_1": 0x61,
+        "numpad_2": 0x62,
+        "numpad_3": 0x63,
+        "numpad_4": 0x64,
+        "numpad_5": 0x65,
+        "numpad_6": 0x66,
+        "numpad_7": 0x67,
+        "numpad_8": 0x68,
+        "numpad_9": 0x69,
+        "numpad_decimal": 0x6E,
+        "numpad_divide": 0x6F,
+        "numpad_multiply": 0x6A,
+        "numpad_subtract": 0x6D,
+        "numpad_add": 0x6B,
+        "numpad_enter": 0x0D,
+    }
+
+    class Keyboard:  # type: ignore[no-redef]
+        def __init__(self) -> None:
+            self.arrow_up: bool = False
+            self.arrow_down: bool = False
+            self.arrow_left: bool = False
+            self.arrow_right: bool = False
+
+            self.enter: bool = False
+            self.backspace: bool = False
+            self.esc: bool = False
+            self.space: bool = False
+            self.ctrl_left: bool = False
+            self.ctrl_right: bool = False
+            self.alt_left: bool = False
+            self.alt_right: bool = False
+            self.shift_left: bool = False
+            self.shift_right: bool = False
+            self.meta_left: bool = False
+            self.meta_right: bool = False
+            self.menu: bool = False
+            self.caps_lock: bool = False
+            self.tab: bool = False
+
+            self.print_screen: bool = False
+            self.scroll_lock: bool = False
+            self.pause: bool = False
+            self.insert: bool = False
+            self.home: bool = False
+            self.page_up: bool = False
+            self.delete: bool = False
+            self.end: bool = False
+            self.page_down: bool = False
+
+            self.key_a: bool = False
+            self.key_b: bool = False
+            self.key_c: bool = False
+            self.key_d: bool = False
+            self.key_e: bool = False
+            self.key_f: bool = False
+            self.key_g: bool = False
+            self.key_h: bool = False
+            self.key_i: bool = False
+            self.key_j: bool = False
+            self.key_k: bool = False
+            self.key_l: bool = False
+            self.key_m: bool = False
+            self.key_n: bool = False
+            self.key_o: bool = False
+            self.key_p: bool = False
+            self.key_q: bool = False
+            self.key_r: bool = False
+            self.key_s: bool = False
+            self.key_t: bool = False
+            self.key_u: bool = False
+            self.key_v: bool = False
+            self.key_w: bool = False
+            self.key_x: bool = False
+            self.key_y: bool = False
+            self.key_z: bool = False
+
+            self.num_0: bool = False
+            self.num_1: bool = False
+            self.num_2: bool = False
+            self.num_3: bool = False
+            self.num_4: bool = False
+            self.num_5: bool = False
+            self.num_6: bool = False
+            self.num_7: bool = False
+            self.num_8: bool = False
+            self.num_9: bool = False
+
+            self.backtick: bool = False
+            self.minus: bool = False
+            self.equals: bool = False
+            self.backslash: bool = False
+            self.left_bracket: bool = False
+            self.right_bracket: bool = False
+            self.semicolon: bool = False
+            self.apostrophe: bool = False
+            self.comma: bool = False
+            self.dot: bool = False
+            self.slash: bool = False
+
+            self.f1: bool = False
+            self.f2: bool = False
+            self.f3: bool = False
+            self.f4: bool = False
+            self.f5: bool = False
+            self.f6: bool = False
+            self.f7: bool = False
+            self.f8: bool = False
+            self.f9: bool = False
+            self.f10: bool = False
+            self.f11: bool = False
+            self.f12: bool = False
+
+            self.numpad_lock: bool = False
+            self.numpad_0: bool = False
+            self.numpad_1: bool = False
+            self.numpad_2: bool = False
+            self.numpad_3: bool = False
+            self.numpad_4: bool = False
+            self.numpad_5: bool = False
+            self.numpad_6: bool = False
+            self.numpad_7: bool = False
+            self.numpad_8: bool = False
+            self.numpad_9: bool = False
+            self.numpad_decimal: bool = False
+            self.numpad_divide: bool = False
+            self.numpad_multiply: bool = False
+            self.numpad_subtract: bool = False
+            self.numpad_add: bool = False
+            self.numpad_enter: bool = False
+
+            self._old_key_states: dict[str, bool] = {}
+            self.reset()
+
+        def _get_keys(self) -> Generator[tuple[str, bool], None, None]:
+            for name, obj in self.__dict__.items():
+                if not isinstance(obj, bool):
+                    continue
+
+                yield name, obj
+
+        def reset(self) -> None:
+            for key, pressed in self._get_keys():
+                self._old_key_states[key] = pressed
+
+        def update(self) -> None:
+            for key, pressed in self._get_keys():
+                if pressed != self._old_key_states[key]:
+                    win32api.keybd_event(KEYBOARD_SCANCODES[key], 0, 0 if pressed else win32con.KEYEVENTF_KEYUP, 0)
 
 else:
 
