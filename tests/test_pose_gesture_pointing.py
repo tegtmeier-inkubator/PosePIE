@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
+# Copyright (c) 2024, 2025 Daniel Stolpmann <dstolpmann@tegtmeier-inkubator.de>
 #
 # This file is part of PosePIE.
 #
@@ -15,7 +15,7 @@
 
 import numpy as np
 
-from pose.gesture.pointing import Pointing
+from pose.gesture.pointing import Pointing, SELECTING_DELAY, SELECTING_REPETITION_INTERVAL
 from tests.utils.pose import Pose
 from utils.side import Side
 
@@ -88,6 +88,52 @@ class TestLeftHand:
 
         assert result.detected is True
         np.testing.assert_allclose(result.xy, [1.0, 1.0])
+
+    def test_selecting(self) -> None:
+        pose = Pose()
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.LEFT, timestamp=0.0)
+        pointing.set_shoulder_width(0.4)
+
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=0.0)
+        assert result.selecting is False
+
+        # Initial
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY - 0.01)
+        assert result.selecting is False
+
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY)
+        assert result.selecting is True
+
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY)
+        assert result.selecting is False
+
+        # 1. repetition
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY + SELECTING_REPETITION_INTERVAL - 0.01)
+        assert result.selecting is False
+
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY + SELECTING_REPETITION_INTERVAL)
+        assert result.selecting is True
+
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY + SELECTING_REPETITION_INTERVAL)
+        assert result.selecting is False
+
+        # 2. repetition
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY + 2 * SELECTING_REPETITION_INTERVAL - 0.01)
+        assert result.selecting is False
+
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY + 2 * SELECTING_REPETITION_INTERVAL)
+        assert result.selecting is True
+
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY + 2 * SELECTING_REPETITION_INTERVAL)
+        assert result.selecting is False
+
+        # Movement
+        pose.left_wrist += np.array([0.2, 0.0, 0.0])
+
+        # No 3. repetition
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY + 3 * SELECTING_REPETITION_INTERVAL)
+        assert result.detected is True
+        assert result.selecting is False
 
     def test_not_detected_outside(self) -> None:
         pose = Pose()
@@ -185,6 +231,52 @@ class TestRightHand:
 
         assert result.detected is True
         np.testing.assert_allclose(result.xy, [1.0, 1.0])
+
+    def test_selecting(self) -> None:
+        pose = Pose()
+        pointing = Pointing(MIN_KEYPOINT_CONF, Side.RIGHT, timestamp=0.0)
+        pointing.set_shoulder_width(0.4)
+
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=0.0)
+        assert result.selecting is False
+
+        # Initial
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY - 0.01)
+        assert result.selecting is False
+
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY)
+        assert result.selecting is True
+
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY)
+        assert result.selecting is False
+
+        # 1. repetition
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY + SELECTING_REPETITION_INTERVAL - 0.01)
+        assert result.selecting is False
+
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY + SELECTING_REPETITION_INTERVAL)
+        assert result.selecting is True
+
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY + SELECTING_REPETITION_INTERVAL)
+        assert result.selecting is False
+
+        # 2. repetition
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY + 2 * SELECTING_REPETITION_INTERVAL - 0.01)
+        assert result.selecting is False
+
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY + 2 * SELECTING_REPETITION_INTERVAL)
+        assert result.selecting is True
+
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY + 2 * SELECTING_REPETITION_INTERVAL)
+        assert result.selecting is False
+
+        # Movement
+        pose.right_wrist += np.array([0.2, 0.0, 0.0])
+
+        # No 3. repetition
+        result = pointing.parse_keypoints(pose.keypoints, timestamp=SELECTING_DELAY + 3 * SELECTING_REPETITION_INTERVAL)
+        assert result.detected is True
+        assert result.selecting is False
 
     def test_not_detected_outside(self) -> None:
         pose = Pose()
