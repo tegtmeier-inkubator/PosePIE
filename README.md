@@ -31,7 +31,7 @@ It is fully configurable by the user via a Python script.
 
 ## Getting Started
 ### Prerequisites
- * Linux
+ * Linux or Windows
  * Python 3.12
  * Webcam
  * NVIDIA GPU (not strictly required, but highly recommended)
