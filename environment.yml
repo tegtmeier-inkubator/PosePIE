@@ -1,0 +1,29 @@
+name: pose-pie
+platforms:
+  - linux-64
+  - win-64
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - cuda-toolkit=12.4
+  - pytorch=2.5.1
+  - torchvision=0.20.1
+  - numpy=2.1.3
+  - libudev=257.2 # [linux]
+  - evdev=1.7.1 # [linux]
+  - fonttools=4.55.3
+  - pip:
+    - ultralytics==8.3.63
+    - lap==0.5.12
+    - pydantic==2.10.5
+    - pydantic-settings==2.7.1
+    - tensorrt-cu12==10.7.0
+    - tensorrt-cu12-bindings==10.7.0
+    - tensorrt-cu12-libs==10.7.0
+    - vgamepad==0.1.0
+    - python-uinput==1.0.1 # [linux]
+    - pywin32==308 # [win]

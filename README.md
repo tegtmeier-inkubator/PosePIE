@@ -36,27 +36,30 @@ It is fully configurable by the user via a Python script.
  * Webcam
  * NVIDIA GPU (not strictly required, but highly recommended)
 
-### Setting up uinput
-PosePIE relies on uinput for emulating input devices.
+### Setting up uinput (Linux only)
+On Linux, PosePIE relies on uinput for emulating input devices.
 Therefore, you have to make sure that the uinput kernel module is loaded and that you have write access to the `/dev/uinput` device.
 Please consult your distro's documentation on how to set this up.
 
 ### Installation
-First, install Pipenv using the following command:
-```sh
-pip install --user pipenv
-```
+First, make sure you have a conda distribution installed.
+Then, install [conda-lock](https://github.com/conda/conda-lock) via one of the installation methods in its readme.
 
-Once you have installed Pipenv, navigate into your local copy of this repository and create a Python virtual environment using the following command:
+Once you have a conda distribution and conda-lock installed, navigate to your local copy of this repository and create a conda environment using the following command:
 ```sh
-pipenv sync --dev
+conda-lock install -n pose-pie conda-lock.yml
 ```
 
 ### Running
-To run PosePIE, it has to be started in the previously created virtual environment and provided with a user script.
-This can be done as follows:
+Before you can run PosePIE, you have to activate the conda environment with:
 ```sh
-pipenv run python main.py user_scripts/mouse.py
+conda activate pose-pie
+```
+This has to be repeated every time you open a new terminal window.
+
+Afterward, you can start PosePIE by providing a user script using the following command:
+```sh
+python main.py user_scripts/mouse.py
 ```
 
 ## Writing Your Own Scripts

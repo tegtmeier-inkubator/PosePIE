@@ -1,35 +1,38 @@
 stages:
   - test
 variables:
+  CONDA_PKGS_DIRS: "$CI_PROJECT_DIR/.cache/conda"
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  PIPENV_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pipenv"
 
 default:
   tags: [docker]
-  image: python:3.12
+  image: continuumio/miniconda3:24.11.1-0
   cache:
     paths:
+      - .cache/conda
       - .cache/pip
-      - .cache/pipenv
   before_script:
-    - apt-get update && apt-get install -y ffmpeg libsm6 libxext6 libevdev2
-    - pip install pipenv
-    - pipenv sync --dev
+    - apt-get update && apt-get install -y libevdev2
+    - conda install --channel=conda-forge --name=base conda-lock
+    - conda-lock install -n pose-pie conda-lock.yml
+    - conda init bash
+    - source ~/.bashrc
+    - conda activate pose-pie
 
 black:
   stage: test
   script:
-    - pipenv run black --check --diff --color --line-length=140 .
+    - black --check --diff --color --line-length=140 --exclude ".cache" .
 
 mypy:
   stage: test
   script:
-    - pipenv run mypy .
+    - mypy .
 
 pytest:
   stage: test
   script:
-    - pipenv run pytest --junitxml=report.xml --cov --cov-report term --cov-report xml:report_cov.xml
+    - pytest --junit-xml=report.xml --cov --cov-report term --cov-report xml:report_cov.xml --ignore=.cache
   artifacts:
     when: always
     reports:
